@@ -28,6 +28,17 @@ void AMapGenerator::GenerateMap()
 	MapGrid->SetSize(Size);
 	MapGrid->SetGridDistance(GridDistance);
 	MapGrid->GenerateMapGrid();
+	
+	//////////////////
+	// Generate Floor
+	//////////////////
+
+	{
+		FVector Position = MapGrid->GetGridMiddle();
+		Position.Z -= MapGrid->GetGridDistance();
+		AActor* Object = GetWorld()->SpawnActor<AActor>(SolidObject, Position, FRotator());
+		Object->SetActorScale3D(FVector(Size.X, Size.Y, 1));
+	}
 	//////////////////
 	//Generate Outline
 	//////////////////

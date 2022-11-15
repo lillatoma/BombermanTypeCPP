@@ -65,6 +65,12 @@ void ABombermanPlayer::BeginPlay()
 	Super::BeginPlay();
 	
 	MoveForce *= Mesh->GetMass();
+
+	// Owner and Avatar are bother this character
+	AbilitySystemComponent->InitAbilityActorInfo(this, this);
+
+	InitializeAttributes();
+	GiveAbilities();
 }
 
 // Called every frame
@@ -79,6 +85,7 @@ void ABombermanPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Input componented")));
 
 	InputComponent->BindAxis("MoveForward", this, &ABombermanPlayer::MoveForward);
 	InputComponent->BindAxis("MoveRight", this, &ABombermanPlayer::MoveRight);
@@ -102,6 +109,8 @@ UAbilitySystemComponent* ABombermanPlayer::GetAbilitySystemComponent() const
 
 void ABombermanPlayer::InitializeAttributes()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Player attributed")));
+
 	// If the ASC and DefaultAttributeEffect objects are valid
 	if (AbilitySystemComponent && DefaultAttributeEffect)
 	{
@@ -109,15 +118,42 @@ void ABombermanPlayer::InitializeAttributes()
 		FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
 		EffectContext.AddSourceObject(this);
 
+		
+
 		// Create an outgoing effect spec using the effect to apply and the context
 		FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(DefaultAttributeEffect, 1, EffectContext);
-
+		
 		if (SpecHandle.IsValid())
 		{
 			// Apply the effect using the derived spec
 			// + Could be ApplyGameplayEffectToTarget() instead if we were shooting a target
 			FActiveGameplayEffectHandle GEHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+			if(GEHandle.WasSuccessfullyApplied())
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Successfully applied")));
+
+			int Num = -1;
+			if(DefaultAttributeEffect.GetDefaultObject())
+				Num = DefaultAttributeEffect.GetDefaultObject()->Modifiers.Num();
+
+
+
+
+
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Player attributed: %d"), Num));
+
+			for (int i = 0; i < Num; i++)
+			{
+				
+				FString GotName = DefaultAttributeEffect.GetDefaultObject()->Modifiers[i].Attribute.GetName();
+
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, GotName);
+			}
+			bool bFound;
+			float bombCount = AbilitySystemComponent->GetGameplayAttributeValue(BombCountAttribute, bFound);
+
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("BombCount is: %f"), bombCount));
 		}
+		
 	}
 }
 
@@ -140,17 +176,15 @@ void ABombermanPlayer::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
-	// Owner and Avatar are bother this character
-	AbilitySystemComponent->InitAbilityActorInfo(this, this);
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Player possessed by")));
 
-	InitializeAttributes();
-	GiveAbilities();
+
 }
 
 void ABombermanPlayer::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
-
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("OnRep")));
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	InitializeAttributes();
 

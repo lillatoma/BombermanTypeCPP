@@ -51,6 +51,13 @@ void ABombermanBomb::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	TArray<AActor*> OverlappingActors;
+	GetOverlappingActors(OverlappingActors, ABombermanPlayer::StaticClass());
+
+	if(OverlappingActors.Num() == 0)
+	{
+		Mesh->SetCollisionProfileName(FName("BlockAllDynamic"), true);
+	}
 }
 
 UAbilitySystemComponent* ABombermanBomb::GetAbilitySystemComponent() const

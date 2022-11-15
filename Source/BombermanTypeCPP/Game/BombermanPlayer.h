@@ -60,6 +60,7 @@ protected:
 	virtual void BeginPlay() override;
 
 
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float MoveForce = 500.f;
 
@@ -74,7 +75,19 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI")
+		class UBehaviorTree* TreeAsset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI")
+		class ASmartObject* SmartObject;
+
+
+
 private:
 	void MoveRight(float value);
 	void MoveForward(float value);
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Prereqs")
+		FGameplayAttribute BombCountAttribute;
 };

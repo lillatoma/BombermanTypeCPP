@@ -52,6 +52,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 		 class ABombermanPlayer* OriginalPlayer;
 
+	virtual void Explode();
+
 private:
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Prereqs")
 		TSubclassOf<class UGameplayAbility> ExplosionAbility;
@@ -69,7 +71,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	virtual void Explode();
+
 
 public:	
 	// Called every frame

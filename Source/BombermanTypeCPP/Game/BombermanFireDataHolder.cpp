@@ -104,10 +104,8 @@ AMapGrid* ABombermanFireDataHolder::FindGrid()
 	if (GridActor)
 	{
 		AMapGrid* Grid = Cast<AMapGrid>(GridActor);
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("GridActor Found")));
 		if (Grid)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Grid Found")));
 			MapGrid = Grid;
 			return MapGrid;
 		}
@@ -154,7 +152,6 @@ bool ABombermanFireDataHolder::SpawnFire(FIntPoint point)
 	if (MapGrid->GetPointOnGrid(point)->Type != EMGPMapGridpointType::Solid)
 	{
 		FVector Location = MapGrid->ConvertGridToWorld(FIntPoint(point));
-		Location.Z += 25.f;
 		const FRotator Rotation = FRotator();
 		AActor* FireObject = GetWorld()->SpawnActor<AActor>(FireActor, Location, Rotation);
 
@@ -181,15 +178,17 @@ bool ABombermanFireDataHolder::SpawnFire(FIntPoint point)
 
 void ABombermanFireDataHolder::SpawnFireFull()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("SpawnFireFull()")));
+
 	if (!MapGrid)
 		FindGrid();
 	if (!MapGrid)
 		return;
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("ExpLength: %d"),ExplosionLength));
+
+
+
 
 	int Left = ExplosionLength, Right = ExplosionLength, Up = ExplosionLength, Down = ExplosionLength;
-
+	SpawnFire(CenterPoint);
 	//LeftSide
 	for (int x = CenterPoint.X - 1; x > 0 && Left > 0; x--)
 	{
@@ -220,4 +219,21 @@ void ABombermanFireDataHolder::SpawnFireFull()
 		if (!SpawnFire(FIntPoint(CenterPoint.X, y)))
 			break;
 	}
+}
+
+void ABombermanFireDataHolder::InitiateDestroyCall()
+{
+	if (hasBeenDestroyCalled)
+		return;
+	hasBeenDestroyCalled = true;
+
+
+	FTimerHandle UnusedHandle;
+	GetWorldTimerManager().SetTimer(
+		UnusedHandle, this, &ABombermanFireDataHolder::CallDestroy, DestroyWaitTime, false);
+}
+
+void ABombermanFireDataHolder::CallDestroy()
+{
+	Destroy();
 }

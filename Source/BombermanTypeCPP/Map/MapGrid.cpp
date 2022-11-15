@@ -60,6 +60,11 @@ FIntPoint AMapGrid::GetSize() const
 	return Size;
 }
 
+float AMapGrid::GetGridDistance() const
+{
+	return GridDistance;
+}
+
 void AMapGrid::SetGridDistance(float gridDistance)
 {
 	this->GridDistance = gridDistance;
@@ -79,3 +84,9 @@ FIntPoint AMapGrid::GetClosestGridPoint(FVector Location)
 {
 	return FIntPoint((Location.X + GridDistance/2) / GridDistance, (Location.Y + GridDistance/2) / GridDistance);
 }
+
+FVector AMapGrid::GetGridMiddle()
+{
+	return FVector(Size.X * GridDistance / 2, Size.Y * GridDistance / 2,0);
+}
+

@@ -2,6 +2,8 @@
 
 
 #include "BombermanFire.h"
+#include "BombermanBomb.h"
+#include "BombermanFireDataHolder.h"
 
 // Sets default values
 ABombermanFire::ABombermanFire()
@@ -23,6 +25,8 @@ void ABombermanFire::BeginPlay()
 	FTimerHandle UnusedHandle;
 	GetWorldTimerManager().SetTimer(
 		UnusedHandle, this, &ABombermanFire::CallDestroy, 1.f, false);
+
+	Mesh->OnComponentBeginOverlap.AddDynamic(this, &ABombermanFire::OverlapBegin);
 }
 
 // Called every frame
@@ -34,5 +38,19 @@ void ABombermanFire::Tick(float DeltaTime)
 
 void ABombermanFire::CallDestroy()
 {
+	if (FireData)
+		FireData->InitiateDestroyCall();
 	Destroy();
+}
+
+void ABombermanFire::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	ABombermanBomb* Bomb = Cast<ABombermanBomb>(OtherActor);
+	FString name = OtherActor->GetName();
+
+
+	if (Bomb)
+	{
+		Bomb->Explode();
+	}
 }

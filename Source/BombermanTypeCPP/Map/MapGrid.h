@@ -29,12 +29,14 @@ public:
 	FIntPoint GetSize() const;
 	void SetSize(int32 x, int32 y);
 	void SetSize(FIntPoint size);
-
+	float GetGridDistance() const;
 	void SetGridDistance(float gridDistance);
 	FVector ConvertGridToWorld(FIntPoint coord);
 
 	FVector GetClosestGridCenter(FVector Location);
 	FIntPoint GetClosestGridPoint(FVector Location);
+
+	FVector GetGridMiddle();
 
 protected:
 	// Called when the game starts or when spawned

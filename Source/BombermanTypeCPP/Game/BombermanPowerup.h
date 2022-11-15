@@ -4,19 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "BombermanFire.generated.h"
+#include "BombermanPowerup.generated.h"
 
 UCLASS()
-class BOMBERMANTYPECPP_API ABombermanFire : public AActor
+class BOMBERMANTYPECPP_API ABombermanPowerup : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	ABombermanFire();
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-		class ABombermanFireDataHolder* FireData;
+	ABombermanPowerup();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 		class UStaticMeshComponent* Mesh;
@@ -33,5 +30,8 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void CallDestroy();
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Prereqs")
+		TSubclassOf< class UGameplayEffect > PowerupEffect;
+
 };

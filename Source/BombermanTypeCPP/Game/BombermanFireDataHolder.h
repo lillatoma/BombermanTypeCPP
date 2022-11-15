@@ -67,13 +67,21 @@ private:
 
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Prereqs")
 		FGameplayAttribute BombLengthAttribute;
+	
+	void CallDestroy();
+
+	bool hasBeenDestroyCalled = false;
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	
-
+	UFUNCTION()
+		void InitiateDestroyCall();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int ExplosionLength;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float DestroyWaitTime;
 };

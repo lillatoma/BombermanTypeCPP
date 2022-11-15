@@ -17,7 +17,9 @@ AMapBreakableBlock::AMapBreakableBlock()
 void AMapBreakableBlock::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	DecideSpawnPowerup();
+
 }
 
 // Called every frame
@@ -27,3 +29,15 @@ void AMapBreakableBlock::Tick(float DeltaTime)
 
 }
 
+void AMapBreakableBlock::DecideSpawnPowerup()
+{
+	float r = FMath::RandRange(0.f, 1.f);
+
+	if (r < SpawnPercentage)
+	{
+		int idx = FMath::RandRange(0, PowerupList.Num() - 1);
+		FVector Location = GetActorLocation();
+		FRotator Rotation;
+		AActor* PowerupObject = GetWorld()->SpawnActor<AActor>(PowerupList[idx], Location, Rotation);
+	}
+}
