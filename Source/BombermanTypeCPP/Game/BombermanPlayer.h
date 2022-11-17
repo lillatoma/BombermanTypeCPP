@@ -11,10 +11,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "GameFramework/Character.h"
 #include "BombermanPlayer.generated.h"
 
+
+
 UCLASS()
-class BOMBERMANTYPECPP_API ABombermanPlayer : public APawn, public IAbilitySystemInterface
+class BOMBERMANTYPECPP_API ABombermanPlayer : public ACharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
@@ -26,7 +29,7 @@ class BOMBERMANTYPECPP_API ABombermanPlayer : public APawn, public IAbilitySyste
 public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-		class UStaticMeshComponent* Mesh;
+		class UStaticMeshComponent* StaticMesh;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 		class USpringArmComponent* SpringArm;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")

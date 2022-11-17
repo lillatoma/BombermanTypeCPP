@@ -11,6 +11,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/CapsuleComponent.h"
 
 // Sets default values
 ABombermanPlayer::ABombermanPlayer()
@@ -26,17 +27,18 @@ ABombermanPlayer::ABombermanPlayer()
 
 
 
-	Mesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
+	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>("SpringArm");
 	Camera = CreateDefaultSubobject<UCameraComponent>("Camera");
 
-	RootComponent = Mesh;
-
-	SpringArm->SetupAttachment(Mesh);
+	//RootComponent = Mesh;
+	StaticMesh->SetupAttachment(GetCapsuleComponent());
+	SpringArm->SetupAttachment(GetCapsuleComponent());
 
 	Camera->SetupAttachment(SpringArm);
 
-	Mesh->SetSimulatePhysics(true);
+	
+	//StaticMesh->SetSimulatePhysics(false);
 
 }
 
@@ -47,7 +49,7 @@ void ABombermanPlayer::MoveRight(float value)
 	FVector Right = FVector(CamRight.X, CamRight.Y, 0);
 	Right = (Right.GetSafeNormal()) * MoveForce * value;
 
-	Mesh->AddForce(Right);
+	GetCapsuleComponent()->AddForce(Right);
 }
 
 void ABombermanPlayer::MoveForward(float value)
@@ -56,7 +58,7 @@ void ABombermanPlayer::MoveForward(float value)
 	
 	FVector Forward = FVector(CamForward.X, CamForward.Y, 0);
 	Forward = (Forward.GetSafeNormal()) * MoveForce * value;
-	Mesh->AddForce(Forward);
+	GetCapsuleComponent()->AddForce(Forward);
 }
 
 // Called when the game starts or when spawned
@@ -64,7 +66,7 @@ void ABombermanPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	MoveForce *= Mesh->GetMass();
+	MoveForce *= GetCapsuleComponent()->GetMass();
 
 	// Owner and Avatar are bother this character
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
