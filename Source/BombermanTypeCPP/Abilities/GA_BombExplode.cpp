@@ -30,8 +30,18 @@ void UGA_BombExplode::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
             auto Context = ActorInfo->AbilitySystemComponent->MakeEffectContext();
             Context.AddSourceObject(Bomb);
 
+            bool bFound1 = false;
+
+            float bombCount = Bomb->OriginalPlayer->GetAbilitySystemComponent()->GetGameplayAttributeValue(BombCountAttribute, bFound1);
+
             Bomb->GetAbilitySystemComponent()->BP_ApplyGameplayEffectToTarget(
                 BombBackEffect, Bomb->OriginalPlayer->GetAbilitySystemComponent(), 1, Context);
+
+
+            //float bombCount2 = Bomb->OriginalPlayer->GetAbilitySystemComponent()->GetGameplayAttributeValue(BombCountAttribute, bFound1);
+            //GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, Bomb->OriginalPlayer->GetName());
+            //GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, BombBackEffect->GetName());
+            //GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Changed: %.1f->%.1f"),bombCount,bombCount2));
             //Bomb->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(BombBackEffect, OriginalPlayer->GetAbilitySystemComponent());
         
             //Spawning FireDataHolder

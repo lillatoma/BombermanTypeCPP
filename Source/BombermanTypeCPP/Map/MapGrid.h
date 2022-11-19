@@ -38,6 +38,21 @@ public:
 
 	FVector GetGridMiddle();
 
+	TArray<FIntPoint> GetReachablePoints(FIntPoint coord);
+
+	void AddBreakable();
+	void RemoveBreakable();
+
+	bool IsPointOnGrid(FIntPoint point);
+
+	void AddBomb(FIntPoint point);
+	void DeleteBomb(FIntPoint point);
+	bool IsSafePoint(FIntPoint point);
+	bool IsBombOnPoint(FIntPoint point);
+
+	int RatePointForExplosion(FIntPoint point, int expRange);
+	FIntPoint GetBestPointForExplosion(TArray<FIntPoint>& points, int expRange);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -45,4 +60,10 @@ protected:
 private:	
 	FIntPoint Size;
 	float GridDistance = 0;
+	int BreakableCount = 0;
+
+	TArray<FIntPoint> BombsPlaced;
+
+	TArray<FIntPoint> GetPointNeighbors(FIntPoint coord);
+
 };

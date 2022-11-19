@@ -80,6 +80,11 @@ void ABombermanPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	bool bFound;
+	float bombCount = AbilitySystemComponent->GetGameplayAttributeValue(BombCountAttribute, bFound);
+
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, GetName());
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("BombCount is: %.f"), bombCount));
 }
 
 // Called to bind functionality to input

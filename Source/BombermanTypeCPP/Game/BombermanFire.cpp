@@ -49,7 +49,7 @@ void ABombermanFire::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AAct
 	FString name = OtherActor->GetName();
 
 
-	if (Bomb)
+	if (Bomb && Bomb->HasBeenSetUp)
 	{
 		Bomb->Explode();
 	}

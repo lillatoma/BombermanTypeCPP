@@ -21,12 +21,16 @@ void UGA_PlantBomb::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 
 
     AActor* GridActor = UGameplayStatics::GetActorOfClass(GetWorld(), AMapGrid::StaticClass());
+    FIntPoint BombPoint;
+
+
     if (GridActor)
     {
         AMapGrid* Grid = Cast<AMapGrid>(GridActor);
         if (Grid)
         {
             Location = Grid->GetClosestGridCenter(Location);
+            BombPoint = Grid->GetClosestGridPoint(Location);
         }
     }
 
@@ -42,8 +46,13 @@ void UGA_PlantBomb::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
         {
             Bomb->OriginalPlayer = Player;
         }
-    }
 
+        Bomb->HasBeenSetUp = true;
+
+        AMapGrid* Grid = Cast<AMapGrid>(GridActor);
+        if (Grid)
+            Grid->AddBomb(BombPoint);
+    }
 
     EndAbility(Handle, ActorInfo, ActivationInfo,false,false);
 }

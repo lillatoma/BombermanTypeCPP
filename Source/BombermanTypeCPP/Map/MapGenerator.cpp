@@ -120,7 +120,7 @@ void AMapGenerator::GenerateMap()
 				FVector Position = MapGrid->ConvertGridToWorld(FIntPoint(x, y));
 				AActor* Object = GetWorld()->SpawnActor<AActor>(BreakableObject, Position, FRotator());
 				MapGrid->GetPointOnGrid(x, y)->Block = Object;
-
+				MapGrid->AddBreakable();
 				//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("(%d|%d) | RR: %f, Chance: %f"), x, y, r, chance));
 			}
 		}

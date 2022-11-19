@@ -29,6 +29,9 @@ private:
         TSubclassOf<AActor> FireDataActor;
 
     UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Prereqs")
+        FGameplayAttribute BombCountAttribute;
+
+    UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Prereqs")
         FGameplayAttribute BombLengthAttribute;
 
     virtual void OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) override;

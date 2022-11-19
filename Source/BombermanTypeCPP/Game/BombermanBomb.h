@@ -49,6 +49,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float FuseTime = 5.f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool HasBeenSetUp = false;;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 		 class ABombermanPlayer* OriginalPlayer;
 

@@ -167,7 +167,7 @@ bool ABombermanFireDataHolder::SpawnFire(FIntPoint point)
 			MapGrid->GetPointOnGrid(point)->Type = EMGPMapGridpointType::Air;
 			MapGrid->GetPointOnGrid(point)->Block->Destroy();
 			MapGrid->GetPointOnGrid(point)->Block = nullptr;
-
+			MapGrid->RemoveBreakable();
 
 			return false;
 		}
@@ -227,6 +227,9 @@ void ABombermanFireDataHolder::InitiateDestroyCall()
 		return;
 	hasBeenDestroyCalled = true;
 
+
+	if (MapGrid)
+		MapGrid->DeleteBomb(CenterPoint);
 
 	FTimerHandle UnusedHandle;
 	GetWorldTimerManager().SetTimer(
