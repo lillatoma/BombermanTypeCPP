@@ -16,8 +16,9 @@
 #include "BombermanTypeCPP\Map\MapGrid.h"
 
 // Sets default values
-ABombermanPlayer::ABombermanPlayer()
+ABombermanPlayer::ABombermanPlayer() : Super()
 {
+
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -30,6 +31,8 @@ ABombermanPlayer::ABombermanPlayer()
 
 
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
+
+
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>("SpringArm");
 	Camera = CreateDefaultSubobject<UCameraComponent>("Camera");
 
@@ -46,8 +49,8 @@ ABombermanPlayer::ABombermanPlayer()
 	bUseControllerRotationYaw = false;
 
 
-	GetCharacterMovement()->bOrientRotationToMovement = false;
-	GetCharacterMovement()->RotationRate = FRotator(0.0f, 0.0f, 0.0f);
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f);
 	GetCharacterMovement()->JumpZVelocity = 0.f;
 	GetCharacterMovement()->AirControl = 0.2f;
 
@@ -66,7 +69,7 @@ void ABombermanPlayer::MoveRight(float value)
 	const FVector CamForward = Camera->GetForwardVector();
 
 	FVector Forward = FVector(CamForward.X, CamForward.Y, 0);
-	Forward = (Forward.GetSafeNormal()) * MoveForce * value;
+	Forward = (Forward.GetSafeNormal()) * MoveForce;
 	FVector Direction = FRotationMatrix(Forward.Rotation()).GetUnitAxis(EAxis::Y);
 
 	AddMovementInput(Direction, value);
