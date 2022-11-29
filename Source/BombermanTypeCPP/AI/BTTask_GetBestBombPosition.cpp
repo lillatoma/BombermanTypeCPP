@@ -9,6 +9,7 @@
 
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyType_Vector.h"
+#include "BehaviorTree/Blackboard/BlackboardKeyType_Float.h"
 
 #include "Kismet/GameplayStatics.h"
 
@@ -74,7 +75,7 @@ EBTNodeResult::Type UBTTask_GetBestBombPosition::ExecuteTask(UBehaviorTreeCompon
 
 
 	bool bFound = false;
-	float bombRange = Chr->GetAbilitySystemComponent()->GetGameplayAttributeValue(BombRangeAttribute, bFound);
+	float bombRange = OwnerComp.GetBlackboardComponent()->GetValue<UBlackboardKeyType_Float>("BombRange");
 
 	FIntPoint BestPoint = Grid->GetBestPointForExplosion(PossiblePoints, bombRange);
 	FVector point = Grid->ConvertGridToWorld(BestPoint);

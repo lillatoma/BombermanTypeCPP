@@ -38,7 +38,7 @@ public:
 
 	FVector GetGridMiddle();
 
-	TArray<FIntPoint> GetReachablePoints(FIntPoint coord);
+	TArray<FIntPoint> GetReachablePoints(FIntPoint coord, bool includePlayers = false);
 
 	void AddBreakable();
 	void RemoveBreakable();
@@ -49,9 +49,23 @@ public:
 	void DeleteBomb(FIntPoint point);
 	bool IsSafePoint(FIntPoint point);
 	bool IsBombOnPoint(FIntPoint point);
+	
+	void AddPowerup(FIntPoint point);
+	void DeletePowerup(FIntPoint point);
+	int GetPowerupCount();
 
+	int GetPlayerIndex();
 	int RatePointForExplosion(FIntPoint point, int expRange);
 	FIntPoint GetBestPointForExplosion(TArray<FIntPoint>& points, int expRange);
+	TArray<FIntPoint> GetReachablePowerupList(TArray<FIntPoint>& points);
+
+	TArray<FIntPoint> GetReachablePlayerList(TArray<FIntPoint>& points, int excludePlayer);
+	TArray<FIntPoint> GetPointsOverseeing(FIntPoint point, int expRange);
+	static TArray<FIntPoint> Intersection(TArray<FIntPoint> A, TArray<FIntPoint> B);
+
+	void UpdatePlayerPosition(int character, FIntPoint point);
+
+	int GetBreakableCount() const;
 
 protected:
 	// Called when the game starts or when spawned
@@ -61,9 +75,11 @@ private:
 	FIntPoint Size;
 	float GridDistance = 0;
 	int BreakableCount = 0;
-
+	int NextPlayerIndex = 0;
 	TArray<FIntPoint> BombsPlaced;
+	TArray<FIntPoint> PowerupsAvailable;
+	TArray<FIntPoint> GetPointNeighbors(FIntPoint coord, bool includePlayers = false);
+	TArray<FIntPoint> Players;
 
-	TArray<FIntPoint> GetPointNeighbors(FIntPoint coord);
-
+	void AddCharacter();
 };

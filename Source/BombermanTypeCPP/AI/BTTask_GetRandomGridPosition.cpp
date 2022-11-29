@@ -9,6 +9,7 @@
 
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyType_Vector.h"
+#include "BehaviorTree/Blackboard/BlackboardKeyType_Bool.h"
 
 #include "Kismet/GameplayStatics.h"
 
@@ -65,7 +66,7 @@ EBTNodeResult::Type UBTTask_GetRandomGridPosition::ExecuteTask(UBehaviorTreeComp
 	}
 	TArray<FIntPoint> PossiblePoints = Grid->GetReachablePoints(ChrOnGrid);
 
-	if(PossiblePoints.Num() == 0)
+	if (PossiblePoints.Num() <= 1)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Nowhere to go")));
 		return EBTNodeResult::Failed;
@@ -80,7 +81,7 @@ EBTNodeResult::Type UBTTask_GetRandomGridPosition::ExecuteTask(UBehaviorTreeComp
 	{
 
 		OwnerComp.GetBlackboardComponent()->SetValue<UBlackboardKeyType_Vector>("MoveToLocation", point);
-
+		OwnerComp.GetBlackboardComponent()->SetValue<UBlackboardKeyType_Bool>("MoveToLocationSafe", true);
 		return EBTNodeResult::Succeeded;
 	}
 	else return EBTNodeResult::Failed;

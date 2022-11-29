@@ -84,4 +84,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float DestroyWaitTime;
+
+	TArray<class ABombermanPlayer*> AffectedPlayers;
+
+	int AffectedCount = 0;
+
+	void AddPlayerToAffected(class ABombermanPlayer* Player);
+
+	void SetAffectedPlayerCount(int count);
 };

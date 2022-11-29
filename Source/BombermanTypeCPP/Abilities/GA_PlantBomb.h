@@ -31,4 +31,7 @@ private:
 
     UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Prereqs")
         FGameplayAttribute BombCountAttribute;
+
+    UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Prereqs")
+        TSubclassOf< UGameplayEffect > BombBackEffect;
 };

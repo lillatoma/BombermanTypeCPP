@@ -34,4 +34,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	void CallDestroy();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float ExplosionTime = 0.25f;
 };

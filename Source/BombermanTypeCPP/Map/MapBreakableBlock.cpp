@@ -2,6 +2,7 @@
 
 
 #include "MapBreakableBlock.h"
+#include "BombermanTypeCPP\Game\BombermanPowerup.h"
 
 // Sets default values
 AMapBreakableBlock::AMapBreakableBlock()
@@ -39,5 +40,12 @@ void AMapBreakableBlock::DecideSpawnPowerup()
 		FVector Location = GetActorLocation();
 		FRotator Rotation;
 		AActor* PowerupObject = GetWorld()->SpawnActor<AActor>(PowerupList[idx], Location, Rotation);
+
+		if (PowerupObject)
+		{
+			ABombermanPowerup* Powerup = Cast<ABombermanPowerup>(PowerupObject);
+			if (Powerup)
+				Powerup->AddOnGrid();
+		}
 	}
 }

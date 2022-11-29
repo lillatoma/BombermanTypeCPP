@@ -70,6 +70,11 @@ protected:
 	virtual void OnRep_PlayerState() override;
 	virtual void PossessedBy(AController* NewController) override;
 
+	class AMapGrid* Grid;
+	class AMapGrid* GetGrid();
+	void UpdateGridPosition();
+	int GridCharacterIndex = -1;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -77,7 +82,7 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-
+	int GetCharacterIndex();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI")
 		class UBehaviorTree* TreeAsset;
@@ -86,11 +91,13 @@ public:
 		class ASmartObject* SmartObject;
 
 
-
 private:
 	void MoveRight(float value);
 	void MoveForward(float value);
 
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Prereqs")
 		FGameplayAttribute BombCountAttribute;
+
+
+
 };

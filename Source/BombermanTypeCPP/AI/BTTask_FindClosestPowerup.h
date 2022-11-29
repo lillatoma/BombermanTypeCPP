@@ -4,23 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/Tasks/BTTask_BlackboardBase.h"
-#include "BombermanTypeCPP/GAS/GAS_AbilitySystemComponent.h"
-#include "BombermanTypeCPP/GAS/GAS_GameplayAbility.h"
-#include "BombermanTypeCPP/GAS/GAS_AttributeSet.h"
-
-#include "BTTask_GetRandomGridPosition.generated.h"
-
+#include "BTTask_FindClosestPowerup.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class BOMBERMANTYPECPP_API UBTTask_GetRandomGridPosition : public UBTTask_BlackboardBase
+class BOMBERMANTYPECPP_API UBTTask_FindClosestPowerup : public UBTTask_BlackboardBase
 {
 	GENERATED_BODY()
-	
 public:
-	UBTTask_GetRandomGridPosition(const FObjectInitializer& ObjectInitializer);
+	UBTTask_FindClosestPowerup(const FObjectInitializer& ObjectInitializer);
 
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 

@@ -31,6 +31,22 @@ void UGA_PlantBomb::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
         {
             Location = Grid->GetClosestGridCenter(Location);
             BombPoint = Grid->GetClosestGridPoint(Location);
+
+            if (Grid->IsBombOnPoint(BombPoint))
+            {
+                ABombermanPlayer* Player = Cast<ABombermanPlayer>(ActorInfo->OwnerActor);
+                if (Player)
+                {
+                    auto Context = ActorInfo->AbilitySystemComponent->MakeEffectContext();
+                    Context.AddSourceObject(Player);
+
+                    Player->GetAbilitySystemComponent()->BP_ApplyGameplayEffectToTarget(
+                        BombBackEffect, Player->GetAbilitySystemComponent(), 1, Context);
+
+                    EndAbility(Handle, ActorInfo, ActivationInfo, false, false);
+                    return;
+                }
+            }
         }
     }
 

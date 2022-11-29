@@ -109,35 +109,70 @@ bool AMapGrid::IsPointOnGrid(FIntPoint point)
 
 }
 
-TArray<FIntPoint> AMapGrid::GetPointNeighbors(FIntPoint coord)
+TArray<FIntPoint> AMapGrid::GetPointNeighbors(FIntPoint coord, bool includePlayers)
 {
-	TArray<FIntPoint> Neighbors;
 
-	if (IsPointOnGrid(FIntPoint(coord.X, coord.Y - 1)) &&
-		GetPointOnGrid(FIntPoint(coord.X, coord.Y - 1))->Type == EMGPMapGridpointType::Air
-		&& BombsPlaced.Find(FIntPoint(coord.X, coord.Y - 1)) == INDEX_NONE)
-		Neighbors.Add(FIntPoint(coord.X, coord.Y - 1));
-	
-	if (IsPointOnGrid(FIntPoint(coord.X, coord.Y + 1)) &&
-		GetPointOnGrid(FIntPoint(coord.X, coord.Y + 1))->Type == EMGPMapGridpointType::Air
-		&& BombsPlaced.Find(FIntPoint(coord.X, coord.Y + 1)) == INDEX_NONE)
-		Neighbors.Add(FIntPoint(coord.X, coord.Y + 1));
+	if (!includePlayers)
+	{
 
-	if (IsPointOnGrid(FIntPoint(coord.X - 1, coord.Y)) &&
-		GetPointOnGrid(FIntPoint(coord.X - 1, coord.Y))->Type == EMGPMapGridpointType::Air
-		&& BombsPlaced.Find(FIntPoint(coord.X - 1, coord.Y)) == INDEX_NONE)
-		Neighbors.Add(FIntPoint(coord.X - 1, coord.Y));
+		TArray<FIntPoint> Neighbors;
 
-	if (IsPointOnGrid(FIntPoint(coord.X + 1, coord.Y)) &&
-		GetPointOnGrid(FIntPoint(coord.X + 1, coord.Y))->Type == EMGPMapGridpointType::Air
-		&& BombsPlaced.Find(FIntPoint(coord.X + 1, coord.Y)) == INDEX_NONE)
-		Neighbors.Add(FIntPoint(coord.X + 1, coord.Y));
+		if (IsPointOnGrid(FIntPoint(coord.X, coord.Y - 1)) &&
+			GetPointOnGrid(FIntPoint(coord.X, coord.Y - 1))->Type == EMGPMapGridpointType::Air
+			&& BombsPlaced.Find(FIntPoint(coord.X, coord.Y - 1)) == INDEX_NONE
+			&& Players.Find(FIntPoint(coord.X, coord.Y - 1)) == INDEX_NONE)
+			Neighbors.Add(FIntPoint(coord.X, coord.Y - 1));
+
+		if (IsPointOnGrid(FIntPoint(coord.X, coord.Y + 1)) &&
+			GetPointOnGrid(FIntPoint(coord.X, coord.Y + 1))->Type == EMGPMapGridpointType::Air
+			&& BombsPlaced.Find(FIntPoint(coord.X, coord.Y + 1)) == INDEX_NONE
+			&& Players.Find(FIntPoint(coord.X, coord.Y + 1)) == INDEX_NONE)
+			Neighbors.Add(FIntPoint(coord.X, coord.Y + 1));
+
+		if (IsPointOnGrid(FIntPoint(coord.X - 1, coord.Y)) &&
+			GetPointOnGrid(FIntPoint(coord.X - 1, coord.Y))->Type == EMGPMapGridpointType::Air
+			&& BombsPlaced.Find(FIntPoint(coord.X - 1, coord.Y)) == INDEX_NONE
+			&& Players.Find(FIntPoint(coord.X - 1, coord.Y)) == INDEX_NONE)
+			Neighbors.Add(FIntPoint(coord.X - 1, coord.Y));
+
+		if (IsPointOnGrid(FIntPoint(coord.X + 1, coord.Y)) &&
+			GetPointOnGrid(FIntPoint(coord.X + 1, coord.Y))->Type == EMGPMapGridpointType::Air
+			&& BombsPlaced.Find(FIntPoint(coord.X + 1, coord.Y)) == INDEX_NONE
+			&& Players.Find(FIntPoint(coord.X + 1, coord.Y)) == INDEX_NONE)
+			Neighbors.Add(FIntPoint(coord.X + 1, coord.Y));
 
 
-	return Neighbors;
+		return Neighbors;
+	}
+	else
+	{
+		TArray<FIntPoint> Neighbors;
+
+		if (IsPointOnGrid(FIntPoint(coord.X, coord.Y - 1)) &&
+			GetPointOnGrid(FIntPoint(coord.X, coord.Y - 1))->Type == EMGPMapGridpointType::Air
+			&& BombsPlaced.Find(FIntPoint(coord.X, coord.Y - 1)) == INDEX_NONE)
+			Neighbors.Add(FIntPoint(coord.X, coord.Y - 1));
+
+		if (IsPointOnGrid(FIntPoint(coord.X, coord.Y + 1)) &&
+			GetPointOnGrid(FIntPoint(coord.X, coord.Y + 1))->Type == EMGPMapGridpointType::Air
+			&& BombsPlaced.Find(FIntPoint(coord.X, coord.Y + 1)) == INDEX_NONE)
+			Neighbors.Add(FIntPoint(coord.X, coord.Y + 1));
+
+		if (IsPointOnGrid(FIntPoint(coord.X - 1, coord.Y)) &&
+			GetPointOnGrid(FIntPoint(coord.X - 1, coord.Y))->Type == EMGPMapGridpointType::Air
+			&& BombsPlaced.Find(FIntPoint(coord.X - 1, coord.Y)) == INDEX_NONE)
+			Neighbors.Add(FIntPoint(coord.X - 1, coord.Y));
+
+		if (IsPointOnGrid(FIntPoint(coord.X + 1, coord.Y)) &&
+			GetPointOnGrid(FIntPoint(coord.X + 1, coord.Y))->Type == EMGPMapGridpointType::Air
+			&& BombsPlaced.Find(FIntPoint(coord.X + 1, coord.Y)) == INDEX_NONE)
+			Neighbors.Add(FIntPoint(coord.X + 1, coord.Y));
+
+		return Neighbors;
+	}
 }
 
-TArray<FIntPoint> AMapGrid::GetReachablePoints(FIntPoint coord)
+TArray<FIntPoint> AMapGrid::GetReachablePoints(FIntPoint coord, bool includePlayers)
 {
 	if (BreakableCount == 0)
 	{
@@ -159,7 +194,7 @@ TArray<FIntPoint> AMapGrid::GetReachablePoints(FIntPoint coord)
 		GridpointsFound.Add(coord);
 
 
-		TArray<FIntPoint> UncheckedPoints = GetPointNeighbors(coord);
+		TArray<FIntPoint> UncheckedPoints = GetPointNeighbors(coord, includePlayers);
 		UncheckedPoints.Reserve((Size.X - 2) * (Size.Y - 2));
 				
 		for (; UncheckedPoints.Num() > 0;)
@@ -171,7 +206,7 @@ TArray<FIntPoint> AMapGrid::GetReachablePoints(FIntPoint coord)
 			{
 				GridpointsFound.Add(last);
 				UncheckedPoints.Remove(last);
-				TArray<FIntPoint> neighbors = GetPointNeighbors(last);
+				TArray<FIntPoint> neighbors = GetPointNeighbors(last, includePlayers);
 				
 				for (int i = 0; i < neighbors.Num(); i++)
 					if (GridpointsFound.Find(neighbors[i]) == INDEX_NONE)
@@ -314,9 +349,33 @@ int AMapGrid::RatePointForExplosion(FIntPoint point, int expRange)
 
 FIntPoint AMapGrid::GetBestPointForExplosion(TArray<FIntPoint>& points, int expRange)
 {
-	
 
+	TArray<FIntPoint> Rated3;
+	TArray<FIntPoint> Rated2;
+	TArray<FIntPoint> Rated1;
+	TArray<FIntPoint> Rated0;
+	int TNum = points.Num();
+	for (int i = 0; i < TNum; i++)
+	{
+		int rating = RatePointForExplosion(points[i],expRange);
+		if (rating >= 3)
+			Rated3.Add(points[i]);
+		else if (rating == 2)
+			Rated2.Add(points[i]);
+		else if (rating == 1)
+			Rated1.Add(points[i]);
+		else if (rating == 0)
+			Rated0.Add(points[i]);
+	}
 
+	if (Rated3.Num() > 0)
+		return Rated3[FMath::RandRange(0, Rated3.Num() - 1)];
+	else if (Rated2.Num() > 0)
+		return Rated2[FMath::RandRange(0, Rated2.Num() - 1)];
+	else if (Rated1.Num() > 0)
+		return Rated1[FMath::RandRange(0, Rated1.Num() - 1)];
+	else 
+		return Rated0[FMath::RandRange(0, Rated0.Num() - 1)];
 	//TArray<int> R;
 	//R.Reserve(points.Num());
 	//for (int i = 0; i < points.Num(); i++)
@@ -376,3 +435,141 @@ FIntPoint AMapGrid::GetBestPointForExplosion(TArray<FIntPoint>& points, int expR
 }
 
 
+TArray<FIntPoint> AMapGrid::GetReachablePowerupList(TArray<FIntPoint>& points)
+{
+	TArray<FIntPoint> Powerups;
+
+	if (PowerupsAvailable.Num() == 0)
+		return Powerups;
+	
+	for (FIntPoint point : points)
+	{
+		if (PowerupsAvailable.Find(point) != INDEX_NONE)
+			Powerups.Add(point);
+	}
+	return Powerups;
+
+}
+
+TArray<FIntPoint> AMapGrid::GetReachablePlayerList(TArray<FIntPoint>& points, int excludePlayer)
+{
+	TArray<FIntPoint> ReachablePlayers;
+
+	int Num = points.Num();
+	for (int i = 0; i < Num; i++)
+	{
+		int Index = Players.Find(points[i]);
+		if (Index != INDEX_NONE && Index != excludePlayer)
+			ReachablePlayers.Add(points[i]);
+	}
+
+	return ReachablePlayers;
+}
+
+TArray<FIntPoint> AMapGrid::GetPointsOverseeing(FIntPoint point, int expRange)
+{
+	TArray<FIntPoint> Points;
+
+	int expLeft = expRange - 1;
+	for (int x = point.X - 1; x > 0 && expLeft > 0; x--)
+	{
+		expLeft--;
+		FIntPoint pt = FIntPoint(x, point.Y);
+		if (GetPointOnGrid(pt)->Type == EMGPMapGridpointType::Air
+			&& BombsPlaced.Find(pt) == INDEX_NONE)
+		{
+			Points.Add(pt);
+		}
+		else break;
+	}
+	expLeft = expRange - 1;
+	for (int x = point.X + 1; x < Size.X - 1 && expLeft > 0; x++)
+	{
+		expLeft--;
+		FIntPoint pt = FIntPoint(x, point.Y);
+		if (GetPointOnGrid(pt)->Type == EMGPMapGridpointType::Air
+			&& BombsPlaced.Find(pt) == INDEX_NONE)
+		{
+			Points.Add(pt);
+		}
+		else break;
+	}
+	expLeft = expRange - 1;
+	for (int y = point.Y - 1; y > 0 && expLeft > 0; y--)
+	{
+		expLeft--;
+		FIntPoint pt = FIntPoint(point.X, y);
+		if (GetPointOnGrid(pt)->Type == EMGPMapGridpointType::Air
+			&& BombsPlaced.Find(pt) == INDEX_NONE)
+		{
+			Points.Add(pt);
+		}
+		else break;
+	}
+	expLeft = expRange - 1;
+	for (int y = point.Y + 1; y < Size.Y && expLeft > 0; y++)
+	{
+		expLeft--;
+		FIntPoint pt = FIntPoint(point.X, y);
+		if (GetPointOnGrid(pt)->Type == EMGPMapGridpointType::Air
+			&& BombsPlaced.Find(pt) == INDEX_NONE)
+		{
+			Points.Add(pt);
+		}
+		else break;
+	}
+
+	return Points;
+}
+
+TArray<FIntPoint> AMapGrid::Intersection(TArray<FIntPoint> A, TArray<FIntPoint> B)
+{
+	TArray<FIntPoint> I;
+
+	int NumA = A.Num(), NumB = B.Num();
+
+	for(int a = 0; a < NumA; a++)
+		for (int b = 0; b < NumB; b++)
+		{
+			if (A[a] == B[b])
+				I.Add(A[a]);
+		}
+	return I;
+}
+
+void AMapGrid::AddPowerup(FIntPoint point)
+{
+	PowerupsAvailable.Add(point);
+}
+
+void AMapGrid::DeletePowerup(FIntPoint point)
+{
+	PowerupsAvailable.Remove(point);
+}
+
+int AMapGrid::GetPowerupCount()
+{
+	return PowerupsAvailable.Num();
+}
+
+int AMapGrid::GetPlayerIndex()
+{
+	NextPlayerIndex++;
+	AddCharacter();
+	return NextPlayerIndex - 1;
+}
+
+void AMapGrid::AddCharacter()
+{
+	Players.Add(FIntPoint());
+}
+
+void AMapGrid::UpdatePlayerPosition(int character, FIntPoint point)
+{
+	Players[character] = point;
+}
+
+int AMapGrid::GetBreakableCount() const
+{
+	return BreakableCount;
+}

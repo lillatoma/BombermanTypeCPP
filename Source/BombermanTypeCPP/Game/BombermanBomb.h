@@ -61,6 +61,8 @@ private:
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Prereqs")
 		TSubclassOf<class UGameplayAbility> ExplosionAbility;
 
+
+
 	FGameplayAbilitySpec BombAbilitySpec;
 
 	UFUNCTION()

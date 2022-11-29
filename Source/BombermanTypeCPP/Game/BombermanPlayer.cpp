@@ -13,6 +13,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 
+#include "BombermanTypeCPP\Map\MapGrid.h"
+
 // Sets default values
 ABombermanPlayer::ABombermanPlayer()
 {
@@ -39,6 +41,16 @@ ABombermanPlayer::ABombermanPlayer()
 
 	
 	//StaticMesh->SetSimulatePhysics(false);
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationRoll = false;
+	bUseControllerRotationYaw = false;
+
+
+	GetCharacterMovement()->bOrientRotationToMovement = false;
+	GetCharacterMovement()->RotationRate = FRotator(0.0f, 0.0f, 0.0f);
+	GetCharacterMovement()->JumpZVelocity = 0.f;
+	GetCharacterMovement()->AirControl = 0.2f;
+
 
 }
 
@@ -47,9 +59,19 @@ void ABombermanPlayer::MoveRight(float value)
 	const FVector CamRight = Camera->GetRightVector();
 	
 	FVector Right = FVector(CamRight.X, CamRight.Y, 0);
-	Right = (Right.GetSafeNormal()) * MoveForce * value;
+	Right = (Right.GetSafeNormal()) * MoveForce;
 
-	GetCapsuleComponent()->AddForce(Right);
+	//GetCapsuleComponent()->AddForce(Right);
+
+	const FVector CamForward = Camera->GetForwardVector();
+
+	FVector Forward = FVector(CamForward.X, CamForward.Y, 0);
+	Forward = (Forward.GetSafeNormal()) * MoveForce * value;
+	FVector Direction = FRotationMatrix(Forward.Rotation()).GetUnitAxis(EAxis::Y);
+
+	AddMovementInput(Direction, value);
+
+
 }
 
 void ABombermanPlayer::MoveForward(float value)
@@ -57,8 +79,12 @@ void ABombermanPlayer::MoveForward(float value)
 	const FVector CamForward = Camera->GetForwardVector();
 	
 	FVector Forward = FVector(CamForward.X, CamForward.Y, 0);
-	Forward = (Forward.GetSafeNormal()) * MoveForce * value;
-	GetCapsuleComponent()->AddForce(Forward);
+	Forward = (Forward.GetSafeNormal()) * MoveForce;
+	//GetCapsuleComponent()->AddForce(Forward);
+
+	FVector Direction = FRotationMatrix(Forward.Rotation()).GetUnitAxis(EAxis::X);
+
+	AddMovementInput(Direction, value);
 }
 
 // Called when the game starts or when spawned
@@ -66,13 +92,16 @@ void ABombermanPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	MoveForce *= GetCapsuleComponent()->GetMass();
+	//MoveForce *= GetCapsuleComponent()->GetMass();
 
 	// Owner and Avatar are bother this character
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 
 	InitializeAttributes();
 	GiveAbilities();
+
+	if (GetGrid())
+		GridCharacterIndex = Grid->GetPlayerIndex();
 }
 
 // Called every frame
@@ -80,11 +109,8 @@ void ABombermanPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	bool bFound;
-	float bombCount = AbilitySystemComponent->GetGameplayAttributeValue(BombCountAttribute, bFound);
-
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, GetName());
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("BombCount is: %.f"), bombCount));
+	if (GridCharacterIndex >= 0)
+		Grid->UpdatePlayerPosition(GridCharacterIndex, Grid->GetClosestGridPoint(GetActorLocation()));
 }
 
 // Called to bind functionality to input
@@ -106,6 +132,11 @@ void ABombermanPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		AbilitySystemComponent->BindAbilityActivationToInputComponent(InputComponent, Binds);
 
 	}
+}
+
+int ABombermanPlayer::GetCharacterIndex()
+{
+	return GridCharacterIndex;
 }
 
 UAbilitySystemComponent* ABombermanPlayer::GetAbilitySystemComponent() const
@@ -201,6 +232,25 @@ void ABombermanPlayer::OnRep_PlayerState()
 		const FGameplayAbilityInputBinds Binds("Confirm", "Cancel", "EGASAbilityInputID", static_cast<int32>(EGASAbilityInputID::Confirm), static_cast<int32>(EGASAbilityInputID::Cancel));
 		AbilitySystemComponent->BindAbilityActivationToInputComponent(InputComponent, Binds);
 	}
+}
+
+AMapGrid* ABombermanPlayer::GetGrid()
+{
+	if (Grid)
+		return Grid;
+
+	AActor* GridActor = UGameplayStatics::GetActorOfClass(GetWorld(), AMapGrid::StaticClass());
+	if (GridActor)
+	{
+		AMapGrid* GridB = Cast<AMapGrid>(GridActor);
+		if (GridB)
+		{
+			Grid = GridB;
+			return Grid;
+		}
+	}
+	return nullptr;
+
 }
 
 

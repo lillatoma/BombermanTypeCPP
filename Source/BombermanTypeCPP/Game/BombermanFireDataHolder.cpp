@@ -32,11 +32,6 @@ void ABombermanFireDataHolder::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	FindGrid();
-	FindBombLength();
-	CalculateGridPosition();
-	SpawnFireFull();
-
 	if (AbilitySystemComponent)
 	{
 		if (HasAuthority() && DamageAbility)
@@ -46,6 +41,13 @@ void ABombermanFireDataHolder::BeginPlay()
 		}
 		AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	}
+
+	FindGrid();
+	FindBombLength();
+	CalculateGridPosition();
+	SpawnFireFull();
+
+
 
 }
 
@@ -153,14 +155,24 @@ bool ABombermanFireDataHolder::SpawnFire(FIntPoint point)
 	{
 		FVector Location = MapGrid->ConvertGridToWorld(FIntPoint(point));
 		const FRotator Rotation = FRotator();
-		AActor* FireObject = GetWorld()->SpawnActor<AActor>(FireActor, Location, Rotation);
+		//AActor* FireObject = GetWorld()->SpawnActor<AActor>(FireActor, Location, Rotation);
+		
+		FTransform SpawnTransform(Rotation, Location, FVector(1, 1, 1));
 
-		if (FireObject)
+		ABombermanFire* Fire = Cast<ABombermanFire>(UGameplayStatics::BeginDeferredActorSpawnFromClass(this, FireActor, SpawnTransform));
+
+		if (Fire)
 		{
-			ABombermanFire* Fire = Cast<ABombermanFire>(FireObject);
-			if (Fire)
-				Fire->FireData = this;
+			Fire->FireData = this;
+			UGameplayStatics::FinishSpawningActor(Fire, SpawnTransform);
 		}
+
+		//if (FireObject)
+		//{
+		//	ABombermanFire* Fire = Cast<ABombermanFire>(FireObject);
+		//	if (Fire)
+		//		Fire->FireData = this;
+		//}
 
 		if (MapGrid->GetPointOnGrid(point)->Type == EMGPMapGridpointType::Breakable)
 		{
@@ -234,6 +246,22 @@ void ABombermanFireDataHolder::InitiateDestroyCall()
 	FTimerHandle UnusedHandle;
 	GetWorldTimerManager().SetTimer(
 		UnusedHandle, this, &ABombermanFireDataHolder::CallDestroy, DestroyWaitTime, false);
+}
+
+void ABombermanFireDataHolder::AddPlayerToAffected(ABombermanPlayer* Player)
+{
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Add To Affected")));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, Player->GetName());
+	if (AffectedPlayers.Find(Player) == INDEX_NONE)
+	{
+		AffectedPlayers.Add(Player);
+		AbilitySystemComponent->TryActivateAbilityByClass(DamageAbility);
+	}
+}
+
+void ABombermanFireDataHolder::SetAffectedPlayerCount(int count)
+{
+	AffectedCount = count;
 }
 
 void ABombermanFireDataHolder::CallDestroy()

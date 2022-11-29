@@ -32,7 +32,4 @@ public:
 private:
 	UPROPERTY()
 		class AMapGrid* Grid;
-
-	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Prereqs")
-		FGameplayAttribute BombRangeAttribute;
 };

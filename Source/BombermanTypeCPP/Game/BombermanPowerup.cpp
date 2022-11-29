@@ -3,6 +3,8 @@
 
 #include "BombermanPowerup.h"
 #include "BombermanPlayer.h"
+#include "BombermanTypeCPP\Map\MapGrid.h"
+#include "Kismet/GameplayStatics.h"
 
 
 // Sets default values
@@ -22,6 +24,14 @@ void ABombermanPowerup::BeginPlay()
 {
 	Super::BeginPlay();
 	Mesh->OnComponentBeginOverlap.AddDynamic(this, &ABombermanPowerup::OverlapBegin);
+
+
+}
+
+void ABombermanPowerup::AddOnGrid()
+{
+	if (GetGrid())
+		Grid->AddPowerup(Grid->GetClosestGridPoint(GetActorLocation()));
 }
 
 // Called every frame
@@ -43,6 +53,28 @@ void ABombermanPowerup::OverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 		Player->GetAbilitySystemComponent()->BP_ApplyGameplayEffectToTarget(
 			PowerupEffect, Player->GetAbilitySystemComponent(), 1, Context);
 
+		if (GetGrid())
+			Grid->DeletePowerup(Grid->GetClosestGridPoint(GetActorLocation()));
+
 		Destroy();
 	}
+}
+
+AMapGrid* ABombermanPowerup::GetGrid()
+{
+	if (Grid)
+		return Grid;
+
+	AActor* GridActor = UGameplayStatics::GetActorOfClass(GetWorld(), AMapGrid::StaticClass());
+	if (GridActor)
+	{
+		AMapGrid* GridB = Cast<AMapGrid>(GridActor);
+		if (GridB)
+		{
+			Grid = GridB;
+			return Grid;
+		}
+	}
+	return nullptr;
+
 }

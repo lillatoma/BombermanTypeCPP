@@ -30,8 +30,14 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	void AddOnGrid();
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Prereqs")
 		TSubclassOf< class UGameplayEffect > PowerupEffect;
 
+private:
+	class AMapGrid* Grid;
+
+	class AMapGrid* GetGrid();
 };
