@@ -6,6 +6,7 @@
 #include "BombermanTypeCPP\UI\EndingWidget.h"
 
 #include "Kismet/GameplayStatics.h"
+#include "GameFramework/PlayerController.h"
 
 // Sets default values
 ABombermanGameEndChecker::ABombermanGameEndChecker()
@@ -58,6 +59,10 @@ void ABombermanGameEndChecker::Tick(float DeltaTime)
 					{
 						GameWidget->AddToViewport();
 						GameWidget->SetWinloseText(false);
+
+						APlayerController* PlayerControllerRef = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+						PlayerControllerRef->SetShowMouseCursor(true);
+						UGameplayStatics::SetGamePaused(GetWorld(), true);
 					}
 				}
 			}
@@ -80,6 +85,10 @@ void ABombermanGameEndChecker::Tick(float DeltaTime)
 			{
 				GameWidget->AddToViewport();
 				GameWidget->SetWinloseText(true);
+
+				APlayerController* PlayerControllerRef = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+				PlayerControllerRef->SetShowMouseCursor(true);
+				UGameplayStatics::SetGamePaused(GetWorld(), true);
 			}
 		}
 	}

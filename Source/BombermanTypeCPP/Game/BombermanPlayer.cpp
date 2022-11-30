@@ -59,10 +59,10 @@ ABombermanPlayer::ABombermanPlayer() : Super()
 
 void ABombermanPlayer::MoveRight(float value)
 {
-	const FVector CamRight = Camera->GetRightVector();
+	//const FVector CamRight = Camera->GetRightVector();
 	
-	FVector Right = FVector(CamRight.X, CamRight.Y, 0);
-	Right = (Right.GetSafeNormal()) * MoveForce;
+	//FVector Right = FVector(CamRight.X, CamRight.Y, 0);
+	//Right = (Right.GetSafeNormal()) * MoveForce;
 
 	//GetCapsuleComponent()->AddForce(Right);
 
@@ -72,7 +72,7 @@ void ABombermanPlayer::MoveRight(float value)
 	Forward = (Forward.GetSafeNormal()) * MoveForce;
 	FVector Direction = FRotationMatrix(Forward.Rotation()).GetUnitAxis(EAxis::Y);
 
-	AddMovementInput(Direction, value);
+	AddMovementInput(Direction, value); 
 
 
 }
