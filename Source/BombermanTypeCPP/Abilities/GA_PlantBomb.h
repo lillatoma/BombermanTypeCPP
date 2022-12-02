@@ -4,7 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "BombermanTypeCPP/GAS/GAS_GameplayAbility.h"
+#include "Abilities/Tasks/AbilityTask.h"
 #include "GA_PlantBomb.generated.h"
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FPlayMontageAndWaitForEventDelegate, FGameplayTag, EventTag, FGameplayEventData, EventData);
 
 /**
  * 
@@ -34,4 +37,28 @@ private:
 
     UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Prereqs")
         TSubclassOf< UGameplayEffect > BombBackEffect;
+
+    UFUNCTION()
+        void OnAnimNotifyBegin(FName Name, const FBranchingPointNotifyPayload& Payload);
+
+    //UFUNCTION()
+        void OnAnimNotifyBeginGP(FGameplayTag Tag, const FGameplayEventData* Payload);
+
+    FGameplayAbilitySpecHandle StoredHandle;
+    const FGameplayAbilityActorInfo* StoredActorInfo;
+    FGameplayAbilityActivationInfo StoredActivationInfo;
+    const FGameplayEventData* StoredTriggerEventData;
+
+    UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Prereqs")
+        class UAnimMontage* PlantMontage;
+
+    UPROPERTY()
+        FGameplayTagContainer EventTags;
+
+    FOnMontageBlendingOutStarted BlendingOutDelegate;
+    FOnMontageEnded MontageEndedDelegate;
+    FDelegateHandle CancelledHandle;
+    FDelegateHandle EventHandle;
+
+    void FinishAbility(UAnimMontage* Montage, bool bInterrupted);
 };

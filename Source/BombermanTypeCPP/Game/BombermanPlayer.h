@@ -95,9 +95,18 @@ private:
 	void MoveRight(float value);
 	void MoveForward(float value);
 
+	//void PlayPlantAnim();
+
+	//UFUNCTION()
+	//void OnAnimNotifyBegin(FName Name, const FBranchingPointNotifyPayload& Payload);
+
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Prereqs")
 		FGameplayAttribute BombCountAttribute;
 
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Prereqs")
+		TSubclassOf<UGameplayAbility> BombPlantAbility;
 
+	//UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Prereqs")
+	//	class UAnimMontage* PlantMontage;
 
 };

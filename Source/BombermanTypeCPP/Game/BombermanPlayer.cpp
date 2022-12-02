@@ -14,6 +14,7 @@
 #include "Components/CapsuleComponent.h"
 
 #include "BombermanTypeCPP\Map\MapGrid.h"
+#include "Animation/AnimInstance.h"
 
 // Sets default values
 ABombermanPlayer::ABombermanPlayer() : Super()
@@ -56,6 +57,33 @@ ABombermanPlayer::ABombermanPlayer() : Super()
 
 
 }
+
+//void ABombermanPlayer::PlayPlantAnim()
+//{
+//
+//	if (GetMesh() && GetMesh()->GetAnimInstance())
+//	{
+//		float MontageLength = GetMesh()->GetAnimInstance()->Montage_Play(PlantMontage, 1.f);
+//		if (MontageLength > 0)
+//		{
+//			GetMesh()->GetAnimInstance()->OnPlayMontageNotifyBegin.AddDynamic(this, &ABombermanPlayer::OnAnimNotifyBegin);
+//		}
+//	}
+//}
+//
+//void ABombermanPlayer::OnAnimNotifyBegin(FName Name, const FBranchingPointNotifyPayload& Payload)
+//{
+//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, Name.ToString());
+//
+//	if (!Name.Compare(FName("Plant")))
+//	{
+//		if (BombPlantAbility)
+//			GetAbilitySystemComponent()->TryActivateAbilityByClass(BombPlantAbility);
+//	}
+//
+//	if (GetMesh() && GetMesh()->GetAnimInstance())
+//		GetMesh()->GetAnimInstance()->OnPlayMontageNotifyBegin.RemoveAll(this);
+//}
 
 void ABombermanPlayer::MoveRight(float value)
 {
@@ -126,13 +154,12 @@ void ABombermanPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	InputComponent->BindAxis("MoveForward", this, &ABombermanPlayer::MoveForward);
 	InputComponent->BindAxis("MoveRight", this, &ABombermanPlayer::MoveRight);
 
-
 	// Make sure GAS is valid along with player input component
 	if (AbilitySystemComponent && InputComponent)
 	{
 		// Where the 3rd parameter is a string equal to enum typename defined in unrealgame5.h
 		const FGameplayAbilityInputBinds Binds("Confirm", "Cancel", "EGASAbilityInputID", static_cast<int32>(EGASAbilityInputID::Confirm), static_cast<int32>(EGASAbilityInputID::Cancel));
-		AbilitySystemComponent->BindAbilityActivationToInputComponent(InputComponent, Binds);
+		AbilitySystemComponent->BindAbilityActivationToInputComponent(InputComponent, Binds); 
 
 	}
 }
