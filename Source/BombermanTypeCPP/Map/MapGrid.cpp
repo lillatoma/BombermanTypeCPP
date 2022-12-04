@@ -223,6 +223,66 @@ TArray<FIntPoint> AMapGrid::GetReachablePoints(FIntPoint coord, bool includePlay
 	return TArray<FIntPoint>();
 }
 
+TArray<FIntPoint> AMapGrid::GetSafeReachablePoints(FIntPoint coord, bool includePlayers)
+{
+	if (BreakableCount == 0)
+	{
+		TArray<FIntPoint> Pts;
+		Pts.Reserve((Size.X - 2) * (Size.Y - 2));
+
+		for (int x = 1; x < Size.X - 1; x++)
+			for (int y = 1; y < Size.Y - 1; y++)
+				if (GetPointOnGrid(x, y)->Type == EMGPMapGridpointType::Air && IsSafePoint(FIntPoint(x,y)))
+					Pts.Add(FIntPoint(x, y));
+
+		return Pts;
+	}
+
+	else if (GetPointOnGrid(coord)->Type == EMGPMapGridpointType::Air)
+	{
+		TArray<FIntPoint> GridpointsFound;
+		GridpointsFound.Reserve((Size.X - 2) * (Size.Y - 2));
+		GridpointsFound.Add(coord);
+
+
+		TArray<FIntPoint> UncheckedPoints = GetPointNeighbors(coord, includePlayers);
+		UncheckedPoints.Reserve((Size.X - 2) * (Size.Y - 2));
+
+		for (; UncheckedPoints.Num() > 0;)
+		{
+			FIntPoint last = UncheckedPoints.Last(0);
+
+
+			if (GridpointsFound.Find(last) == INDEX_NONE)
+			{
+				GridpointsFound.Add(last);
+				UncheckedPoints.Remove(last);
+				TArray<FIntPoint> neighbors = GetPointNeighbors(last, includePlayers);
+
+				for (int i = 0; i < neighbors.Num(); i++)
+					if (GridpointsFound.Find(neighbors[i]) == INDEX_NONE)
+						UncheckedPoints.Add(neighbors[i]);
+			}
+			else UncheckedPoints.Remove(last);
+
+		}
+
+		TArray<FIntPoint> SafePoints;
+		int Total = GridpointsFound.Num();
+		SafePoints.Reserve(Total);
+		for (int i = 0; i < Total; i++)
+		{
+			if (IsSafePoint(GridpointsFound[i]))
+				SafePoints.Add(GridpointsFound[i]);
+
+		}
+
+
+		return SafePoints;
+	}
+	return TArray<FIntPoint>();
+}
+
 void AMapGrid::AddBomb(FIntPoint point)
 {
 	BombsPlaced.Add(point);

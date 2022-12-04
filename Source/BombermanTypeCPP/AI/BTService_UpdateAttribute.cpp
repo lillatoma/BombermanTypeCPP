@@ -16,6 +16,8 @@ UBTService_UpdateAttribute::UBTService_UpdateAttribute(const FObjectInitializer&
 
 void UBTService_UpdateAttribute::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
+	//This service is a base for updating a specific attribute
+
 	const UBlackboardComponent* MyBlackboard = OwnerComp.GetBlackboardComponent();
 	AAIController* MyController = OwnerComp.GetAIOwner();
 

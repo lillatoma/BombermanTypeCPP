@@ -33,5 +33,5 @@ private:
 		class AMapGrid* Grid;
 
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Prereqs")
-		TSubclassOf<class UGameplayAbility> ExplosionAbility;
+		TSubclassOf<class UGameplayAbility> BombPlantAbility;
 };

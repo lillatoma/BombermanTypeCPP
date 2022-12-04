@@ -42,6 +42,8 @@ AMapGrid* UBTTask_GetClosestAttackPosition::GetGrid()
 
 EBTNodeResult::Type UBTTask_GetClosestAttackPosition::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
+	//This task finds the closest position where a bomb would damage a player
+	//Closest regarding to current position of the AI
 	const UBlackboardComponent* MyBlackboard = OwnerComp.GetBlackboardComponent();
 	AAIController* MyController = OwnerComp.GetAIOwner();
 

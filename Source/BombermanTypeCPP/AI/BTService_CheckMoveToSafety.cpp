@@ -20,6 +20,8 @@ UBTService_CheckMoveToSafety::UBTService_CheckMoveToSafety(const FObjectInitiali
 
 void UBTService_CheckMoveToSafety::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
+	//This service checks if the MoveToLocation is safe from bombs
+
 	const UBlackboardComponent* MyBlackboard = OwnerComp.GetBlackboardComponent();
 	AAIController* MyController = OwnerComp.GetAIOwner();
 

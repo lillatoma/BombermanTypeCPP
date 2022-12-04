@@ -40,6 +40,9 @@ AMapGrid* UBTTask_FindClosestPowerup::GetGrid()
 
 EBTNodeResult::Type UBTTask_FindClosestPowerup::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
+	//This tasks finds the closest reachable powerup
+	//TODO: Use grid to count distance, instead of linear distance
+
 	const UBlackboardComponent* MyBlackboard = OwnerComp.GetBlackboardComponent();
 	AAIController* MyController = OwnerComp.GetAIOwner();
 

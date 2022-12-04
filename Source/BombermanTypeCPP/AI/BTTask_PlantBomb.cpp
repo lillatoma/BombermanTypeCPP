@@ -40,6 +40,7 @@ AMapGrid* UBTTask_PlantBomb::GetGrid()
 
 EBTNodeResult::Type UBTTask_PlantBomb::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
+	//This task activates the bomb plant ability
 	const UBlackboardComponent* MyBlackboard = OwnerComp.GetBlackboardComponent();
 	AAIController* MyController = OwnerComp.GetAIOwner();
 
@@ -53,7 +54,7 @@ EBTNodeResult::Type UBTTask_PlantBomb::ExecuteTask(UBehaviorTreeComponent& Owner
 		return EBTNodeResult::Failed;
 	}
 	
-	Chr->GetAbilitySystemComponent()->TryActivateAbilityByClass(ExplosionAbility);
+	Chr->GetAbilitySystemComponent()->TryActivateAbilityByClass(BombPlantAbility);
 
 	return EBTNodeResult::Succeeded;
 

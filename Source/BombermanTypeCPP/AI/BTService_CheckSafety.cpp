@@ -19,6 +19,7 @@ UBTService_CheckSafety::UBTService_CheckSafety(const FObjectInitializer& ObjectI
 
 void UBTService_CheckSafety::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
+	//This services checks if the current location is safe from bombs
 	const UBlackboardComponent* MyBlackboard = OwnerComp.GetBlackboardComponent();
 	AAIController* MyController = OwnerComp.GetAIOwner();
 

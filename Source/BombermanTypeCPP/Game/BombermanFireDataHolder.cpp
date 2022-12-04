@@ -118,6 +118,7 @@ AMapGrid* ABombermanFireDataHolder::FindGrid()
 
 void ABombermanFireDataHolder::FindBombLength()
 {
+	return;
 	AActor* PlayerActor = GetOwner();
 
 	if (PlayerActor)

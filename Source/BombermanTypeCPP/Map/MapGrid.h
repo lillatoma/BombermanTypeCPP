@@ -39,6 +39,7 @@ public:
 	FVector GetGridMiddle();
 
 	TArray<FIntPoint> GetReachablePoints(FIntPoint coord, bool includePlayers = false);
+	TArray<FIntPoint> GetSafeReachablePoints(FIntPoint coord, bool includePlayers = false);
 
 	void AddBreakable();
 	void RemoveBreakable();

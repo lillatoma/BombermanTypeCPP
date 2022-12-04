@@ -19,6 +19,7 @@ UBTService_CountBreakables::UBTService_CountBreakables(const FObjectInitializer&
 
 void UBTService_CountBreakables::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
+	//This service updates the BreakableCount to be the breakable count of the grid
 	const UBlackboardComponent* MyBlackboard = OwnerComp.GetBlackboardComponent();
 	AAIController* MyController = OwnerComp.GetAIOwner();
 

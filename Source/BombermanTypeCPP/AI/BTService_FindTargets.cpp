@@ -19,6 +19,8 @@ UBTService_FindTargets::UBTService_FindTargets(const FObjectInitializer& ObjectI
 
 void UBTService_FindTargets::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
+	//This service counts the enemy players that are reachable
+
 	const UBlackboardComponent* MyBlackboard = OwnerComp.GetBlackboardComponent();
 	AAIController* MyController = OwnerComp.GetAIOwner();
 

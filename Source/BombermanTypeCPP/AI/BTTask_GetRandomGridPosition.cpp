@@ -43,32 +43,29 @@ AMapGrid* UBTTask_GetRandomGridPosition::GetGrid()
 
 EBTNodeResult::Type UBTTask_GetRandomGridPosition::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
+	//This task randomly finds a safe position on the grid
 	const UBlackboardComponent* MyBlackboard = OwnerComp.GetBlackboardComponent();
 	AAIController* MyController = OwnerComp.GetAIOwner();
 
 	if (!MyController || !MyBlackboard)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("No controller or blackboard")));
 		return EBTNodeResult::Failed;
 	}
 	ABombermanPlayer* Chr = Cast<ABombermanPlayer>(MyController->GetPawn());
 	if (!Chr || !GetGrid())
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("No character or grid")));
 		return EBTNodeResult::Failed;
 	}
 	FIntPoint ChrOnGrid = Grid->GetClosestGridPoint(Chr->GetActorLocation());
 
 	if (!Grid->IsPointOnGrid(ChrOnGrid))
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Not on grid")));
 		return EBTNodeResult::Failed;
 	}
-	TArray<FIntPoint> PossiblePoints = Grid->GetReachablePoints(ChrOnGrid);
+	TArray<FIntPoint> PossiblePoints = Grid->GetSafeReachablePoints(ChrOnGrid);
 
 	if (PossiblePoints.Num() <= 1)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Nowhere to go")));
 		return EBTNodeResult::Failed;
 	}
 

@@ -20,8 +20,6 @@ class BOMBERMANTYPECPP_API UGA_DamagePlayer : public UGAS_GameplayAbility
 			const FGameplayEventData* TriggerEventData) override;
 
 private:
-	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Prereqs")
-		FGameplayAttribute HealthAttribute;
 
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Prereqs")
 		TSubclassOf< UGameplayEffect > DamageEffect;

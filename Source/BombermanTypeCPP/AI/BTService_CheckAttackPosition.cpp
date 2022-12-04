@@ -22,6 +22,10 @@ UBTService_CheckAttackPosition::UBTService_CheckAttackPosition(const FObjectInit
 
 void UBTService_CheckAttackPosition::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
+	//This service checks if the attacking plant position
+	//Would still hit an enemy or not
+	//If it wouldn't, it invalidates the TargetPositionValid key
+
 	const UBlackboardComponent* MyBlackboard = OwnerComp.GetBlackboardComponent();
 	AAIController* MyController = OwnerComp.GetAIOwner();
 

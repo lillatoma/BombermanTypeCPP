@@ -17,6 +17,7 @@ UBTTask_GetPathPoints::UBTTask_GetPathPoints(const FObjectInitializer& ObjectIni
 
 EBTNodeResult::Type UBTTask_GetPathPoints::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
+	//Archive
 	const UBlackboardComponent* MyBlackboard = OwnerComp.GetBlackboardComponent();
 	AAIController* MyController = OwnerComp.GetAIOwner();
 

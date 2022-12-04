@@ -16,7 +16,12 @@ void UGA_DamagePlayer::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 
     if (FireData)
     {
-        for (int i = FireData->AffectedCount; i < FireData->AffectedPlayers.Num(); i++)
+        //The idea here is the same explosion should not apply damage to the same character
+        //Affected Players are assumed to not have the same character twice
+        //So we start from the count of already affected players
+        //Then apply the damage effect, and store the new affected character count
+        int AffNum = FireData->AffectedPlayers.Num();
+        for (int i = FireData->AffectedCount; i < AffNum; i++)
         {
             auto Context = ActorInfo->AbilitySystemComponent->MakeEffectContext();
             Context.AddSourceObject(FireData);
@@ -24,7 +29,7 @@ void UGA_DamagePlayer::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
             FireData->GetAbilitySystemComponent()->BP_ApplyGameplayEffectToTarget(
                 DamageEffect, FireData->AffectedPlayers[i]->GetAbilitySystemComponent(), 1, Context);
         }
-        FireData->SetAffectedPlayerCount(FireData->AffectedPlayers.Num());
+        FireData->SetAffectedPlayerCount(AffNum);
     }
 
 

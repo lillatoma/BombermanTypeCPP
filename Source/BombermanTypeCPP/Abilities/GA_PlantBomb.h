@@ -38,11 +38,8 @@ private:
     UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Prereqs")
         TSubclassOf< UGameplayEffect > BombBackEffect;
 
-    UFUNCTION()
-        void OnAnimNotifyBegin(FName Name, const FBranchingPointNotifyPayload& Payload);
 
-    //UFUNCTION()
-        void OnAnimNotifyBeginGP(FGameplayTag Tag, const FGameplayEventData* Payload);
+    void OnAnimNotifyBegin(FGameplayTag Tag, const FGameplayEventData* Payload);
 
     FGameplayAbilitySpecHandle StoredHandle;
     const FGameplayAbilityActorInfo* StoredActorInfo;

@@ -19,6 +19,8 @@ UBTService_CountPowerups::UBTService_CountPowerups(const FObjectInitializer& Obj
 
 void UBTService_CountPowerups::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
+	//This service counts the reachable powerups
+
 	const UBlackboardComponent* MyBlackboard = OwnerComp.GetBlackboardComponent();
 	AAIController* MyController = OwnerComp.GetAIOwner();
 

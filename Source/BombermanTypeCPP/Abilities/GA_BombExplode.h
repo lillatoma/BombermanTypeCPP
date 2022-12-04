@@ -19,7 +19,7 @@ class BOMBERMANTYPECPP_API UGA_BombExplode : public UGAS_GameplayAbility
             const FGameplayAbilityActivationInfo ActivationInfo,
             const FGameplayEventData* TriggerEventData) override;
 
-
+#pragma region Vars
 public:     
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Prereqs")
     TSubclassOf< UGameplayEffect > BombBackEffect;
@@ -29,11 +29,7 @@ private:
         TSubclassOf<AActor> FireDataActor;
 
     UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Prereqs")
-        FGameplayAttribute BombCountAttribute;
-
-    UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Prereqs")
         FGameplayAttribute BombLengthAttribute;
-
-    virtual void OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) override;
+#pragma endregion
 
 };

@@ -24,6 +24,8 @@ UBTTask_GetBestBombPosition::UBTTask_GetBestBombPosition(const FObjectInitialize
 
 AMapGrid* UBTTask_GetBestBombPosition::GetGrid()
 {
+	//This task rates available points on the grids, and randomly chooses one
+	//TODO: Absolutely nullify the score of gridpoints that would leave the character with no safe space to move
 	if (Grid)
 		return Grid;
 
