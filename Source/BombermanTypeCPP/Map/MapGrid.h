@@ -31,7 +31,7 @@ public:
 	void SetSize(FIntPoint size);
 	float GetGridDistance() const;
 	void SetGridDistance(float gridDistance);
-	FVector ConvertGridToWorld(FIntPoint coord);
+	FVector ConvertGridToWorld(FIntPoint coord) const;
 
 	FVector GetClosestGridCenter(FVector Location);
 	FIntPoint GetClosestGridPoint(FVector Location);
@@ -67,6 +67,8 @@ public:
 	void UpdatePlayerPosition(int character, FIntPoint point);
 
 	int GetBreakableCount() const;
+
+	TArray<FVector> GetFourCorners() const;
 
 protected:
 	// Called when the game starts or when spawned

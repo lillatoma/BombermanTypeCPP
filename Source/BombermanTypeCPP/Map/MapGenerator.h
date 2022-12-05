@@ -47,4 +47,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float GridDistance;
+
+	AMapGrid* GetGrid() const;
 };

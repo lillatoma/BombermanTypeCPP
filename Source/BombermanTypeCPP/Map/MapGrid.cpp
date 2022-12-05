@@ -72,7 +72,7 @@ void AMapGrid::SetGridDistance(float gridDistance)
 	this->GridDistance = gridDistance;
 }
 
-FVector AMapGrid::ConvertGridToWorld(FIntPoint coord)
+FVector AMapGrid::ConvertGridToWorld(FIntPoint coord) const
 {
 	return FVector(coord.X * GridDistance, coord.Y * GridDistance, 0.f);
 }
@@ -632,4 +632,15 @@ void AMapGrid::UpdatePlayerPosition(int character, FIntPoint point)
 int AMapGrid::GetBreakableCount() const
 {
 	return BreakableCount;
+}
+
+TArray<FVector> AMapGrid::GetFourCorners() const
+{
+	TArray<FVector> Corners;
+	Corners.Add(ConvertGridToWorld(FIntPoint(1, 1)));
+	Corners.Add(ConvertGridToWorld(FIntPoint(Size.X - 2, 1)));
+	Corners.Add(ConvertGridToWorld(FIntPoint(Size.X - 2, Size.Y - 2)));
+	Corners.Add(ConvertGridToWorld(FIntPoint(1, Size.Y - 2)));
+
+	return Corners;
 }

@@ -136,3 +136,8 @@ void AMapGenerator::Tick(float DeltaTime)
 
 }
 
+AMapGrid* AMapGenerator::GetGrid() const
+{
+	return MapGrid;
+}
+
