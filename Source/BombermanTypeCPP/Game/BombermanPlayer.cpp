@@ -29,26 +29,17 @@ ABombermanPlayer::ABombermanPlayer() : Super()
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
 	Attributes = CreateDefaultSubobject<UGAS_AttributeSet>(TEXT("Attributes"));
 
-
-
-	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
-
-
+	//Default spawning components
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>("SpringArm");
 	Camera = CreateDefaultSubobject<UCameraComponent>("Camera");
-
-	//RootComponent = Mesh;
-	StaticMesh->SetupAttachment(GetCapsuleComponent());
 	SpringArm->SetupAttachment(GetCapsuleComponent());
-
 	Camera->SetupAttachment(SpringArm);
 
-	
-	//StaticMesh->SetSimulatePhysics(false);
+
+	//Default setting character
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
 	bUseControllerRotationYaw = false;
-
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f);
@@ -58,46 +49,13 @@ ABombermanPlayer::ABombermanPlayer() : Super()
 
 }
 
-//void ABombermanPlayer::PlayPlantAnim()
-//{
-//
-//	if (GetMesh() && GetMesh()->GetAnimInstance())
-//	{
-//		float MontageLength = GetMesh()->GetAnimInstance()->Montage_Play(PlantMontage, 1.f);
-//		if (MontageLength > 0)
-//		{
-//			GetMesh()->GetAnimInstance()->OnPlayMontageNotifyBegin.AddDynamic(this, &ABombermanPlayer::OnAnimNotifyBegin);
-//		}
-//	}
-//}
-//
-//void ABombermanPlayer::OnAnimNotifyBegin(FName Name, const FBranchingPointNotifyPayload& Payload)
-//{
-//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, Name.ToString());
-//
-//	if (!Name.Compare(FName("Plant")))
-//	{
-//		if (BombPlantAbility)
-//			GetAbilitySystemComponent()->TryActivateAbilityByClass(BombPlantAbility);
-//	}
-//
-//	if (GetMesh() && GetMesh()->GetAnimInstance())
-//		GetMesh()->GetAnimInstance()->OnPlayMontageNotifyBegin.RemoveAll(this);
-//}
-
 void ABombermanPlayer::MoveRight(float value)
 {
-	//const FVector CamRight = Camera->GetRightVector();
-	
-	//FVector Right = FVector(CamRight.X, CamRight.Y, 0);
-	//Right = (Right.GetSafeNormal()) * MoveForce;
-
-	//GetCapsuleComponent()->AddForce(Right);
 
 	const FVector CamForward = Camera->GetForwardVector();
 
 	FVector Forward = FVector(CamForward.X, CamForward.Y, 0);
-	Forward = (Forward.GetSafeNormal()) * MoveForce;
+	Forward = (Forward.GetSafeNormal());
 	FVector Direction = FRotationMatrix(Forward.Rotation()).GetUnitAxis(EAxis::Y);
 
 	AddMovementInput(Direction, value); 
@@ -110,8 +68,7 @@ void ABombermanPlayer::MoveForward(float value)
 	const FVector CamForward = Camera->GetForwardVector();
 	
 	FVector Forward = FVector(CamForward.X, CamForward.Y, 0);
-	Forward = (Forward.GetSafeNormal()) * MoveForce;
-	//GetCapsuleComponent()->AddForce(Forward);
+	Forward = (Forward.GetSafeNormal());
 
 	FVector Direction = FRotationMatrix(Forward.Rotation()).GetUnitAxis(EAxis::X);
 
@@ -125,12 +82,13 @@ void ABombermanPlayer::BeginPlay()
 	
 	//MoveForce *= GetCapsuleComponent()->GetMass();
 
-	// Owner and Avatar are bother this character
+	// Owner and Avatar are both are this character
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 
 	InitializeAttributes();
 	GiveAbilities();
 
+	//If there is a grid, this gets a new player ID from it
 	if (GetGrid())
 		GridCharacterIndex = Grid->GetPlayerIndex();
 }
@@ -140,6 +98,7 @@ void ABombermanPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//If it is at least 0 (not -1, meaning it was set), then it updates the gridposition
 	if (GridCharacterIndex >= 0)
 		Grid->UpdatePlayerPosition(GridCharacterIndex, Grid->GetClosestGridPoint(GetActorLocation()));
 }
@@ -148,8 +107,6 @@ void ABombermanPlayer::Tick(float DeltaTime)
 void ABombermanPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Input componented")));
 
 	InputComponent->BindAxis("MoveForward", this, &ABombermanPlayer::MoveForward);
 	InputComponent->BindAxis("MoveRight", this, &ABombermanPlayer::MoveRight);
@@ -164,7 +121,7 @@ void ABombermanPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	}
 }
 
-int ABombermanPlayer::GetCharacterIndex()
+int ABombermanPlayer::GetCharacterIndex() const
 {
 	return GridCharacterIndex;
 }
@@ -177,7 +134,6 @@ UAbilitySystemComponent* ABombermanPlayer::GetAbilitySystemComponent() const
 
 void ABombermanPlayer::InitializeAttributes()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Player attributed")));
 
 	// If the ASC and DefaultAttributeEffect objects are valid
 	if (AbilitySystemComponent && DefaultAttributeEffect)
@@ -196,30 +152,8 @@ void ABombermanPlayer::InitializeAttributes()
 			// Apply the effect using the derived spec
 			// + Could be ApplyGameplayEffectToTarget() instead if we were shooting a target
 			FActiveGameplayEffectHandle GEHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
-			if(GEHandle.WasSuccessfullyApplied())
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Successfully applied")));
-
-			int Num = -1;
-			if(DefaultAttributeEffect.GetDefaultObject())
-				Num = DefaultAttributeEffect.GetDefaultObject()->Modifiers.Num();
 
 
-
-
-
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Player attributed: %d"), Num));
-
-			for (int i = 0; i < Num; i++)
-			{
-				
-				FString GotName = DefaultAttributeEffect.GetDefaultObject()->Modifiers[i].Attribute.GetName();
-
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, GotName);
-			}
-			bool bFound;
-			float bombCount = AbilitySystemComponent->GetGameplayAttributeValue(BombCountAttribute, bFound);
-
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("BombCount is: %f"), bombCount));
 		}
 		
 	}
@@ -244,15 +178,11 @@ void ABombermanPlayer::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Player possessed by")));
-
-
 }
 
 void ABombermanPlayer::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("OnRep")));
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	InitializeAttributes();
 

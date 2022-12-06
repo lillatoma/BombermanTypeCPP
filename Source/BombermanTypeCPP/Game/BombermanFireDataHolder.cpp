@@ -16,7 +16,7 @@
 ABombermanFireDataHolder::ABombermanFireDataHolder()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 
 	AbilitySystemComponent = CreateDefaultSubobject<UGAS_AbilitySystemComponent>(TEXT("AbilitySystemComponent"));
@@ -41,9 +41,9 @@ void ABombermanFireDataHolder::BeginPlay()
 		}
 		AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	}
-
+	//Finding the grid, and position on it, and spawning fire accordingly
+	//Without grid, nothing happens
 	FindGrid();
-	FindBombLength();
 	CalculateGridPosition();
 	SpawnFireFull();
 
@@ -51,12 +51,6 @@ void ABombermanFireDataHolder::BeginPlay()
 
 }
 
-// Called every frame
-void ABombermanFireDataHolder::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
 
 UAbilitySystemComponent* ABombermanFireDataHolder::GetAbilitySystemComponent() const
 {
@@ -116,27 +110,6 @@ AMapGrid* ABombermanFireDataHolder::FindGrid()
 	return nullptr;
 }
 
-void ABombermanFireDataHolder::FindBombLength()
-{
-	return;
-	AActor* PlayerActor = GetOwner();
-
-	if (PlayerActor)
-	{
-		ABombermanPlayer* Player = Cast<ABombermanPlayer>(PlayerActor);
-
-		if (Player)
-		{
-			bool bFound = false;
-			if (Player->GetAbilitySystemComponent())
-			{
-				ExplosionLength = Player->GetAbilitySystemComponent()
-					->GetGameplayAttributeValue(BombLengthAttribute, bFound);
-			}
-		}
-	}
-
-}
 
 void ABombermanFireDataHolder::CalculateGridPosition()
 {
@@ -152,41 +125,44 @@ void ABombermanFireDataHolder::CalculateGridPosition()
 
 bool ABombermanFireDataHolder::SpawnFire(FIntPoint point)
 {
-	if (MapGrid->GetPointOnGrid(point)->Type != EMGPMapGridpointType::Solid)
+	
+	UMapGridpoint* GP = MapGrid->GetPointOnGrid(point);
+	//We should spawn a fire object, if it's not a solid wall
+	if (GP && GP->Type != EMGPMapGridpointType::Solid)
 	{
 		FVector Location = MapGrid->ConvertGridToWorld(FIntPoint(point));
 		const FRotator Rotation = FRotator();
-		//AActor* FireObject = GetWorld()->SpawnActor<AActor>(FireActor, Location, Rotation);
-		
+
 		FTransform SpawnTransform(Rotation, Location, FVector(1, 1, 1));
 
-		ABombermanFire* Fire = Cast<ABombermanFire>(UGameplayStatics::BeginDeferredActorSpawnFromClass(this, FireActor, SpawnTransform));
 
+		//Spawning a fire actor, but it has to get the firedata passed first
+		ABombermanFire* Fire = Cast<ABombermanFire>(UGameplayStatics::BeginDeferredActorSpawnFromClass(this, FireActor, SpawnTransform));
 		if (Fire)
 		{
 			Fire->FireData = this;
 			UGameplayStatics::FinishSpawningActor(Fire, SpawnTransform);
 		}
+		//If the fire is spawned on a breakable, we destroy the breakable
 
-		//if (FireObject)
-		//{
-		//	ABombermanFire* Fire = Cast<ABombermanFire>(FireObject);
-		//	if (Fire)
-		//		Fire->FireData = this;
-		//}
 
-		if (MapGrid->GetPointOnGrid(point)->Type == EMGPMapGridpointType::Breakable)
+		if (GP->Type == EMGPMapGridpointType::Breakable)
 		{
-			MapGrid->GetPointOnGrid(point)->Type = EMGPMapGridpointType::Air;
-			MapGrid->GetPointOnGrid(point)->Block->Destroy();
-			MapGrid->GetPointOnGrid(point)->Block = nullptr;
+
+			GP->Type = EMGPMapGridpointType::Air;
+			if (GP->Block)
+			{
+				GP->Block->Destroy();
+				GP->Block = nullptr;
+			}
 			MapGrid->RemoveBreakable();
 
 			return false;
 		}
 		return true;
+
 	}
-	else return false;
+	return false;
 }
 
 void ABombermanFireDataHolder::SpawnFireFull()
@@ -196,13 +172,15 @@ void ABombermanFireDataHolder::SpawnFireFull()
 		FindGrid();
 	if (!MapGrid)
 		return;
-
-
-
-
 	int Left = ExplosionLength, Right = ExplosionLength, Up = ExplosionLength, Down = ExplosionLength;
+	
+	//Spawning on the centerpoint
 	SpawnFire(CenterPoint);
+
 	//LeftSide
+	//We go as much towards the left, as much is possible
+	//If the explosion reaches its max length, the condition won't be met anymore
+	//If we hit a block, then the loop breaks
 	for (int x = CenterPoint.X - 1; x > 0 && Left > 0; x--)
 	{
 		Left--;
@@ -236,6 +214,9 @@ void ABombermanFireDataHolder::SpawnFireFull()
 
 void ABombermanFireDataHolder::InitiateDestroyCall()
 {
+	//This function can only be called once
+	//It tells the grid, that a bomb no longer exists at that point
+	//Then initiates a timed destroy call
 	if (hasBeenDestroyCalled)
 		return;
 	hasBeenDestroyCalled = true;
@@ -251,11 +232,13 @@ void ABombermanFireDataHolder::InitiateDestroyCall()
 
 void ABombermanFireDataHolder::AddPlayerToAffected(ABombermanPlayer* Player)
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Add To Affected")));
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, Player->GetName());
-	if (AffectedPlayers.Find(Player) == INDEX_NONE)
+	//It only adds the player on the list, if it's not on it
+	if (AffectedPlayers.Num() == 0 || AffectedPlayers.Find(Player) == INDEX_NONE)
 	{
+
 		AffectedPlayers.Add(Player);
+		///Calling the activation here, because I thought it wouldn't be good to monitor
+		///the AffectedPlayers.Num() change in Tick()
 		AbilitySystemComponent->TryActivateAbilityByClass(DamageAbility);
 	}
 }

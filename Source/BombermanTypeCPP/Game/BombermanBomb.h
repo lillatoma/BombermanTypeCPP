@@ -16,7 +16,7 @@ UCLASS()
 class BOMBERMANTYPECPP_API ABombermanBomb : public AActor
 {
 	GENERATED_BODY()
-	
+#pragma region GAS
 public:
 	// GAS declarations
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GAS")
@@ -37,11 +37,13 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GAS")
 		TArray<TSubclassOf<class UGAS_GameplayAbility>> DefaultAbilities;
 
-
+#pragma endregion
 
 public:	
 	// Sets default values for this actor's properties
 	ABombermanBomb();
+
+#pragma region Vars
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 		class UStaticMeshComponent* Mesh;
@@ -50,21 +52,22 @@ public:
 		float FuseTime = 5.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		bool HasBeenSetUp = false;;
+		bool HasBeenSetUp = false;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 		 class ABombermanPlayer* OriginalPlayer;
-
-	virtual void Explode();
 
 private:
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Prereqs")
 		TSubclassOf<class UGameplayAbility> ExplosionAbility;
 
+#pragma endregion
+
+public:
+	virtual void Explode();
 
 
-	FGameplayAbilitySpec BombAbilitySpec;
-
+private:
 	UFUNCTION()
 		void DestroySelf();
 

@@ -21,11 +21,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TArray<class UMapGridpoint*> Gridpoints;
 
+#pragma region BaseFunctions
+
 	class UMapGridpoint* GetPointOnGrid(int32 x, int32 y);
 	class UMapGridpoint* GetPointOnGrid(FIntPoint coord);
 
 	TArray<class UMapGridpoint*>* GenerateMapGrid();
-
+	
+	bool IsPointOnGrid(FIntPoint point) const;
 	FIntPoint GetSize() const;
 	void SetSize(int32 x, int32 y);
 	void SetSize(FIntPoint size);
@@ -33,10 +36,15 @@ public:
 	void SetGridDistance(float gridDistance);
 	FVector ConvertGridToWorld(FIntPoint coord) const;
 
-	FVector GetClosestGridCenter(FVector Location);
-	FIntPoint GetClosestGridPoint(FVector Location);
+	FVector GetClosestGridCenter(FVector Location) const;
+	FIntPoint GetClosestGridPoint(FVector Location) const;
+	FVector GetGridMiddle() const;
 
-	FVector GetGridMiddle();
+	TArray<FVector> GetFourCorners() const;
+
+#pragma endregion
+
+#pragma region AIHelpers
 
 	TArray<FIntPoint> GetReachablePoints(FIntPoint coord, bool includePlayers = false);
 	TArray<FIntPoint> GetSafeReachablePoints(FIntPoint coord, bool includePlayers = false);
@@ -44,7 +52,7 @@ public:
 	void AddBreakable();
 	void RemoveBreakable();
 
-	bool IsPointOnGrid(FIntPoint point);
+
 
 	void AddBomb(FIntPoint point);
 	void DeleteBomb(FIntPoint point);
@@ -68,7 +76,8 @@ public:
 
 	int GetBreakableCount() const;
 
-	TArray<FVector> GetFourCorners() const;
+#pragma endregion
+
 
 protected:
 	// Called when the game starts or when spawned

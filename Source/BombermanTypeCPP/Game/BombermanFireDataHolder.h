@@ -18,6 +18,7 @@ class BOMBERMANTYPECPP_API ABombermanFireDataHolder : public AActor
 {
 	GENERATED_BODY()
 	
+#pragma region GAS
 public:
 	// GAS declarations
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GAS")
@@ -37,7 +38,7 @@ public:
 	virtual void GiveAbilities();
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GAS")
 		TArray<TSubclassOf<class UGAS_GameplayAbility>> DefaultAbilities;
-
+#pragma endregion
 public:	
 	// Sets default values for this actor's properties
 	ABombermanFireDataHolder();
@@ -49,15 +50,17 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	//Function that finds the explosion's center
 	virtual void CalculateGridPosition();
+	//Function to find the grid object
 	virtual class AMapGrid* FindGrid();
-	virtual void FindBombLength();
-
+	//Function to spawn all objects for explosion 
 	virtual void SpawnFireFull();
+	///Function that spawns explosion on a single gridpoint
+	///Returns true if spawned without obstacles
 	virtual bool SpawnFire(FIntPoint point);
 
-	TArray<class ABombermanFire*> FireObjects;
-
+#pragma region Vars
 private:
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Prereqs")
 		TSubclassOf<class UGameplayAbility> DamageAbility;
@@ -67,23 +70,28 @@ private:
 
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Prereqs")
 		FGameplayAttribute BombLengthAttribute;
-	
-	void CallDestroy();
 
-	bool hasBeenDestroyCalled = false;
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-	
-	UFUNCTION()
-		void InitiateDestroyCall();
-
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int ExplosionLength;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float DestroyWaitTime;
+
+#pragma endregion
+
+private:
+
+	void CallDestroy();
+
+	bool hasBeenDestroyCalled = false;
+
+public:	
+	
+	UFUNCTION()
+		void InitiateDestroyCall();
+
+#pragma region Damager
 
 	TArray<class ABombermanPlayer*> AffectedPlayers;
 
@@ -92,4 +100,9 @@ public:
 	void AddPlayerToAffected(class ABombermanPlayer* Player);
 
 	void SetAffectedPlayerCount(int count);
+
+#pragma endregion
+
+
 };
+

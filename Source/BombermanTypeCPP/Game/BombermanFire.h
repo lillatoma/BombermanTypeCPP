@@ -15,7 +15,7 @@ public:
 	// Sets default values for this actor's properties
 	ABombermanFire();
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		class ABombermanFireDataHolder* FireData;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
@@ -30,8 +30,6 @@ protected:
 
 
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 
 	void CallDestroy();
 

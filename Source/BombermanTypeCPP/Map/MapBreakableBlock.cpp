@@ -34,6 +34,7 @@ void AMapBreakableBlock::DecideSpawnPowerup()
 {
 	float r = FMath::RandRange(0.f, 1.f);
 
+	//If it should spawn, it spawns a random powerup from the list inside the breakable block
 	if (r < SpawnPercentage)
 	{
 		int idx = FMath::RandRange(0, PowerupList.Num() - 1);

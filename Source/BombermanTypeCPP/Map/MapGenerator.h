@@ -15,6 +15,23 @@ public:
 	// Sets default values for this actor's properties
 	AMapGenerator();
 
+
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+	class AMapGrid* MapGrid;
+
+	virtual void GenerateMap();
+	
+#pragma region Vars
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Prereqs")
+	TSubclassOf<AActor> BreakableObject;
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Prereqs")
+	TSubclassOf<AActor> SolidObject;
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FIntPoint Size;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -25,28 +42,16 @@ public:
 		float outerCircleRadius;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float outerCircleBreakableChance;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float GridDistance;
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-	class AMapGrid* MapGrid;
-
-	virtual void GenerateMap();
-	
-	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Prereqs")
-	TSubclassOf<AActor> BreakableObject;
-	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Prereqs")
-	TSubclassOf<AActor> SolidObject;
-
-
+#pragma endregion
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float GridDistance;
+
 
 	AMapGrid* GetGrid() const;
 };

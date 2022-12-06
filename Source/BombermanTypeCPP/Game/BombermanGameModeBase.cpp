@@ -9,10 +9,14 @@
 void ABombermanGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
+	//Try spawning the mapgenerator
 	AActor* MapGenActor = GetWorld()->SpawnActor<AActor>(MapGenerator, FVector(), FRotator());
 
 	AMapGenerator* MapGen = Cast<AMapGenerator>(MapGenActor);
 
+	//If it is successful
+	//We get the four corners of the grid
+	//Then spawn the player and as many AIs as needed in random corners
 	if (MapGenActor)
 	{
 		AMapGrid* Grid = MapGen->GetGrid();

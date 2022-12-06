@@ -18,12 +18,12 @@ AMapGrid::AMapGrid()
 void AMapGrid::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 
-UMapGridpoint* AMapGrid::GetPointOnGrid(int x, int y)
+UMapGridpoint* AMapGrid::GetPointOnGrid(int32 x, int32 y)
 {
+	//To understand this, look at indexes visualized in GenerateMapGrid
 	return Gridpoints[y * Size.X + x];
 }
 
@@ -34,6 +34,16 @@ UMapGridpoint* AMapGrid::GetPointOnGrid(FIntPoint coord)
 
 TArray<class UMapGridpoint*>* AMapGrid::GenerateMapGrid()
 {
+	//////////////////////
+	// Indexes visualized
+	//////////////////////
+	// 12 13 14 15
+	// 8  9  10 11
+	// 4  5  6  7
+	// 0  1  2  3
+	/////////////////////
+
+
 	for (int y = 0; y < Size.Y; y++)
 	{
 		for (int x = 0; x < Size.X; x++)
@@ -74,20 +84,21 @@ void AMapGrid::SetGridDistance(float gridDistance)
 
 FVector AMapGrid::ConvertGridToWorld(FIntPoint coord) const
 {
-	return FVector(coord.X * GridDistance, coord.Y * GridDistance, 0.f);
+	return FVector(GridDistance * coord.X, GridDistance * coord.Y, 0.f);
 }
 
-FVector AMapGrid::GetClosestGridCenter(FVector Location)
+FVector AMapGrid::GetClosestGridCenter(FVector Location) const
 {
 	return ConvertGridToWorld(FIntPoint((Location.X + GridDistance/2) / GridDistance, (Location.Y + GridDistance/2) / GridDistance));
 }
 
-FIntPoint AMapGrid::GetClosestGridPoint(FVector Location)
+FIntPoint AMapGrid::GetClosestGridPoint(FVector Location) const
 {
+	//Adding (0.5f* GridDistance,0.5f*GridDistance,0) to fix the calculation
 	return FIntPoint((Location.X + GridDistance/2) / GridDistance, (Location.Y + GridDistance/2) / GridDistance);
 }
 
-FVector AMapGrid::GetGridMiddle()
+FVector AMapGrid::GetGridMiddle() const
 {
 	return FVector(Size.X * GridDistance / 2, Size.Y * GridDistance / 2,0);
 }
@@ -102,10 +113,10 @@ void AMapGrid::RemoveBreakable()
 	BreakableCount--;
 }
 
-bool AMapGrid::IsPointOnGrid(FIntPoint point)
+bool AMapGrid::IsPointOnGrid(FIntPoint point) const
 {
+	//Returns true if the point has coordinates that are on the grid
 	return (point.X >= 0 && point.Y >= 0 && point.X < Size.X && point.Y < Size.Y);
-
 
 }
 
@@ -114,7 +125,9 @@ TArray<FIntPoint> AMapGrid::GetPointNeighbors(FIntPoint coord, bool includePlaye
 
 	if (!includePlayers)
 	{
-
+		//If include players is false
+		//Then it checks if the neighboring gridpoint is air, has no bomb placed there, and there is no player there
+		//If these conditions are met, then its a true neighbor
 		TArray<FIntPoint> Neighbors;
 
 		if (IsPointOnGrid(FIntPoint(coord.X, coord.Y - 1)) &&
@@ -145,7 +158,9 @@ TArray<FIntPoint> AMapGrid::GetPointNeighbors(FIntPoint coord, bool includePlaye
 		return Neighbors;
 	}
 	else
-	{
+	{	//If include players is false
+		//Then it checks if the neighboring gridpoint is air, and has no bomb placed there
+		//If these conditions are met, then its a true neighbor
 		TArray<FIntPoint> Neighbors;
 
 		if (IsPointOnGrid(FIntPoint(coord.X, coord.Y - 1)) &&
@@ -174,6 +189,7 @@ TArray<FIntPoint> AMapGrid::GetPointNeighbors(FIntPoint coord, bool includePlaye
 
 TArray<FIntPoint> AMapGrid::GetReachablePoints(FIntPoint coord, bool includePlayers)
 {
+	//If there is no object to break, every place on the map is reachable (except solids)
 	if (BreakableCount == 0)
 	{
 		TArray<FIntPoint> Pts;
@@ -186,14 +202,17 @@ TArray<FIntPoint> AMapGrid::GetReachablePoints(FIntPoint coord, bool includePlay
 
 		return Pts;
 	}
-
+	//If there is a breakable left, then we should be looking to find from an Air Gridpoint
 	else if (GetPointOnGrid(coord)->Type == EMGPMapGridpointType::Air)
 	{
+		//First we initialize our gridpoints found
+		//The original point is always reachable, since its Air, so add it
 		TArray<FIntPoint> GridpointsFound;
 		GridpointsFound.Reserve((Size.X - 2) * (Size.Y - 2));
 		GridpointsFound.Add(coord);
 
-
+		//Then we check if we have neighbors
+		//If we have, that means we can continue the search on those points
 		TArray<FIntPoint> UncheckedPoints = GetPointNeighbors(coord, includePlayers);
 		UncheckedPoints.Reserve((Size.X - 2) * (Size.Y - 2));
 				
@@ -201,7 +220,11 @@ TArray<FIntPoint> AMapGrid::GetReachablePoints(FIntPoint coord, bool includePlay
 		{
 			FIntPoint last = UncheckedPoints.Last(0);
 			
-			
+			//If this point is not added yet, we add it
+			//Then remove it from the unchecked points
+			//And run the search on its neighbors
+			//If the neighbors are not added to the reachable gridpoints
+			//Then we add it to check those points later
 			if (GridpointsFound.Find(last) == INDEX_NONE)
 			{
 				GridpointsFound.Add(last);
@@ -232,12 +255,13 @@ TArray<FIntPoint> AMapGrid::GetSafeReachablePoints(FIntPoint coord, bool include
 
 		for (int x = 1; x < Size.X - 1; x++)
 			for (int y = 1; y < Size.Y - 1; y++)
+				//Same as in GetReachablePoints but with safety check
 				if (GetPointOnGrid(x, y)->Type == EMGPMapGridpointType::Air && IsSafePoint(FIntPoint(x,y)))
 					Pts.Add(FIntPoint(x, y));
 
 		return Pts;
 	}
-
+	//Same as in GetReachablePoints, but with safety check at the end
 	else if (GetPointOnGrid(coord)->Type == EMGPMapGridpointType::Air)
 	{
 		TArray<FIntPoint> GridpointsFound;
@@ -267,6 +291,7 @@ TArray<FIntPoint> AMapGrid::GetSafeReachablePoints(FIntPoint coord, bool include
 
 		}
 
+		//If a point is safe, then we add it to safepoints
 		TArray<FIntPoint> SafePoints;
 		int Total = GridpointsFound.Num();
 		SafePoints.Reserve(Total);
@@ -295,6 +320,10 @@ void AMapGrid::DeleteBomb(FIntPoint point)
 
 bool AMapGrid::IsSafePoint(FIntPoint point)
 {
+	//This function checks all 4 directions if a bomb's explosion could reach there
+	//Assuming the bomb's explosion length is infinite
+	//TODO: calculate with breakables:
+	//Example for todo: there is one breakable, but 2 bombs on the other side, then it's not safe
 	for (int b = 0; b < BombsPlaced.Num(); b++)
 	{
 		if (point == BombsPlaced[b])
@@ -345,6 +374,8 @@ bool AMapGrid::IsBombOnPoint(FIntPoint point)
 
 int AMapGrid::RatePointForExplosion(FIntPoint point, int expRange)
 {
+	//This function gives a score for a point on the grid according to how many breakables it can break
+	//TODO: Chain calculation for if a bomb could be in expRange
 	if (IsBombOnPoint(point))
 		return 0;
 
@@ -409,6 +440,8 @@ int AMapGrid::RatePointForExplosion(FIntPoint point, int expRange)
 
 FIntPoint AMapGrid::GetBestPointForExplosion(TArray<FIntPoint>& points, int expRange)
 {
+	//This function rates every point in the points array
+	//Returns one randomly from the best ones
 
 	TArray<FIntPoint> Rated3;
 	TArray<FIntPoint> Rated2;
@@ -468,6 +501,12 @@ FIntPoint AMapGrid::GetBestPointForExplosion(TArray<FIntPoint>& points, int expR
 
 	//return points[R[bestIndex]];
 
+	//Archive: Not deleting this part below, 
+	//         because if chain bomb calculations are added, 
+	//         this is better than the above code
+
+	
+	/*
 	int32 LastIndex = points.Num() - 1;
 
 	for (int32 i = 0; i <= LastIndex; i++)
@@ -491,17 +530,21 @@ FIntPoint AMapGrid::GetBestPointForExplosion(TArray<FIntPoint>& points, int expR
 	}
 
 	return points[bestIndex];
+	*/
 
 }
 
 
 TArray<FIntPoint> AMapGrid::GetReachablePowerupList(TArray<FIntPoint>& points)
 {
+	//Assuming that points is the array of reachable points
 	TArray<FIntPoint> Powerups;
 
+	//If no powerups are available, then we can't find one
 	if (PowerupsAvailable.Num() == 0)
 		return Powerups;
 	
+	//Checking every point of points if they have a powerup
 	for (FIntPoint point : points)
 	{
 		if (PowerupsAvailable.Find(point) != INDEX_NONE)
@@ -513,6 +556,7 @@ TArray<FIntPoint> AMapGrid::GetReachablePowerupList(TArray<FIntPoint>& points)
 
 TArray<FIntPoint> AMapGrid::GetReachablePlayerList(TArray<FIntPoint>& points, int excludePlayer)
 {
+	//Assuming that points is the array of reachable points, and excludePlayer is the playerID that we don't calculate with
 	TArray<FIntPoint> ReachablePlayers;
 
 	int Num = points.Num();
@@ -528,6 +572,7 @@ TArray<FIntPoint> AMapGrid::GetReachablePlayerList(TArray<FIntPoint>& points, in
 
 TArray<FIntPoint> AMapGrid::GetPointsOverseeing(FIntPoint point, int expRange)
 {
+	//This function returns an array of points that can be seen from a point in expRange distance
 	TArray<FIntPoint> Points;
 
 	int expLeft = expRange - 1;
@@ -584,6 +629,7 @@ TArray<FIntPoint> AMapGrid::GetPointsOverseeing(FIntPoint point, int expRange)
 
 TArray<FIntPoint> AMapGrid::Intersection(TArray<FIntPoint> A, TArray<FIntPoint> B)
 {
+	//Returns the intersection of two arrays
 	TArray<FIntPoint> I;
 
 	int NumA = A.Num(), NumB = B.Num();
@@ -636,6 +682,7 @@ int AMapGrid::GetBreakableCount() const
 
 TArray<FVector> AMapGrid::GetFourCorners() const
 {
+	//Returns the four corners of the map
 	TArray<FVector> Corners;
 	Corners.Add(ConvertGridToWorld(FIntPoint(1, 1)));
 	Corners.Add(ConvertGridToWorld(FIntPoint(Size.X - 2, 1)));

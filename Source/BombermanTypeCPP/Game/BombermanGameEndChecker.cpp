@@ -16,11 +16,8 @@ ABombermanGameEndChecker::ABombermanGameEndChecker()
 
 }
 
-// Called when the game starts or when spawned
-void ABombermanGameEndChecker::BeginPlay()
+void ABombermanGameEndChecker::FindPlayerList()
 {
-	Super::BeginPlay();
-	
 	TArray<AActor*> FoundActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABombermanPlayer::StaticClass(), FoundActors);
 
@@ -32,13 +29,48 @@ void ABombermanGameEndChecker::BeginPlay()
 		if (Player)
 			PlayerList.Add(Player);
 	}
+}
 
+// Called when the game starts or when spawned
+void ABombermanGameEndChecker::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	//Finding all players
+	//Assuming that these players are spawned in less than 5 seconds
+	//And that the game doesn't end that soon
+	FTimerHandle UnusedHandle;
+	GetWorldTimerManager().SetTimer(
+		UnusedHandle, this, &ABombermanGameEndChecker::FindPlayerList, 5.f, false);
+
+}
+
+void ABombermanGameEndChecker::SpawnWidget(bool won)
+{
+	//This function spawns the widget if available
+	//The game also becomes paused, so this in Tick() can only be called once
+	
+	if (GameWidgetClass)
+	{
+		GameWidget = Cast<UEndingWidget>(CreateWidget(GetWorld(), GameWidgetClass));
+
+		if (GameWidget)
+		{
+			GameWidget->AddToViewport();
+			GameWidget->SetWinloseText(won);
+
+			APlayerController* PlayerControllerRef = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+			PlayerControllerRef->SetShowMouseCursor(true);
+			UGameplayStatics::SetGamePaused(GetWorld(), true);
+		}
+	}
 }
 
 // Called every frame
 void ABombermanGameEndChecker::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
 
 	int PNum = PlayerList.Num();
 	for (int i = PNum - 1; i >= 0; i--)
@@ -49,23 +81,12 @@ void ABombermanGameEndChecker::Tick(float DeltaTime)
 
 		if (bFound && health <= 0)
 		{
+			//If it is the player who died, then the game ends with a lose
 			if (PlayerList[i]->IsPlayerControlled())
 			{
-				if (GameWidgetClass)
-				{
-					GameWidget = Cast<UEndingWidget>(CreateWidget(GetWorld(), GameWidgetClass));
-
-					if (GameWidget)
-					{
-						GameWidget->AddToViewport();
-						GameWidget->SetWinloseText(false);
-
-						APlayerController* PlayerControllerRef = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-						PlayerControllerRef->SetShowMouseCursor(true);
-						UGameplayStatics::SetGamePaused(GetWorld(), true);
-					}
-				}
+				SpawnWidget(false);
 			}
+			//If it is an enemy, we simply destroy it, and remove it from the list
 			else
 			{
 				PlayerList[i]->Destroy();
@@ -74,23 +95,11 @@ void ABombermanGameEndChecker::Tick(float DeltaTime)
 			}
 		}
 	}
-
+	//If there is only one player left, and it is player controlled
+	//Then the player won
 	if (PlayerList.Num() == 1 && PlayerList[0]->IsPlayerControlled())
 	{
-		if (GameWidgetClass)
-		{
-			GameWidget = Cast<UEndingWidget>(CreateWidget(GetWorld(), GameWidgetClass));
-
-			if (GameWidget)
-			{
-				GameWidget->AddToViewport();
-				GameWidget->SetWinloseText(true);
-
-				APlayerController* PlayerControllerRef = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-				PlayerControllerRef->SetShowMouseCursor(true);
-				UGameplayStatics::SetGamePaused(GetWorld(), true);
-			}
-		}
+		SpawnWidget(true);
 	}
 }
 

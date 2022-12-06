@@ -45,7 +45,8 @@ void ABombermanPowerup::OverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 {
 	ABombermanPlayer* Player = Cast<ABombermanPlayer>(OtherActor);
 
-
+	//In case a player picks the powerup up, we apply the powerup effect
+	//And remove it from the grid before destroying
 	if (Player)
 	{
 		auto Context = Player->GetAbilitySystemComponent()->MakeEffectContext();

@@ -27,9 +27,12 @@ void ABombermanBomb::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//Adding DestroySelf to be called when the ability is ended
 	AbilitySystemComponent->OnAbilityEnded.AddUFunction(this, FName("DestroySelf"));
 	
 	FTimerHandle UnusedHandle;
+	//Timing the explode function to trigger once after FuseTime
+	//That function tries activating the explosion ability, but only once
 	GetWorldTimerManager().SetTimer(
 		UnusedHandle, this, &ABombermanBomb::Explode, FuseTime, false);
 
@@ -37,7 +40,7 @@ void ABombermanBomb::BeginPlay()
 	{
 		if (HasAuthority() && ExplosionAbility)
 		{
-			BombAbilitySpec = FGameplayAbilitySpec(ExplosionAbility.GetDefaultObject(), 1, 0);
+			auto BombAbilitySpec = FGameplayAbilitySpec(ExplosionAbility.GetDefaultObject(), 1, 0);
 			AbilitySystemComponent->GiveAbility(BombAbilitySpec);
 		}
 		AbilitySystemComponent->InitAbilityActorInfo(this, this);
@@ -51,6 +54,8 @@ void ABombermanBomb::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//Checking for overlapping actors, and solidify if there is none
+	//No walking through bombs after ;)
 	TArray<AActor*> OverlappingActors;
 	GetOverlappingActors(OverlappingActors, ABombermanPlayer::StaticClass());
 
@@ -109,6 +114,8 @@ void ABombermanBomb::CallDestroy()
 
 void ABombermanBomb::DestroySelf()
 {
+	//This is a timed destroy call (needed to be a void function)
+	//When it wasn't timed, the game crashed when the ability ended
 	FTimerHandle UnusedHandle;
 	GetWorldTimerManager().SetTimer(
 		UnusedHandle, this, &ABombermanBomb::CallDestroy, 0.0001f, false);
@@ -119,9 +126,7 @@ void ABombermanBomb::Explode()
 	if (hasBeenDetonated)
 		return;
 	hasBeenDetonated = true;
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Explode() at Bomb")));
-
+	
 	AbilitySystemComponent->TryActivateAbilityByClass(ExplosionAbility);
-	//AbilitySystemComponent->TryActivateAbility(BombAbilitySpec.Handle);
 
 }

@@ -24,6 +24,10 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	virtual void FindPlayerList();
+
+	virtual void SpawnWidget(bool won);
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

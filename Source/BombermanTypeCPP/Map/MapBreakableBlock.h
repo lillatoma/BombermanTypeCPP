@@ -15,8 +15,16 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 		class UStaticMeshComponent* Mesh;
 
+#pragma region Vars
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Prereqs")
 		float SpawnPercentage;
+
+private:
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Prereqs")
+		TArray<TSubclassOf<AActor>> PowerupList;
+
+#pragma endregion
 
 public:	
 	// Sets default values for this actor's properties
@@ -30,9 +38,6 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-private:
-	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Prereqs")
-		TArray<TSubclassOf<AActor>> PowerupList;
 
 	UFUNCTION()
 		void DecideSpawnPowerup();
